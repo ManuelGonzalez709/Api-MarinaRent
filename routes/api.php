@@ -1,12 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UsuarioController;
-Route::get('/', function () {
-    return view('welcome');
-});
+use Illuminate\Support\Facades\Route;
+
 
 Route::get('/usuarios',[UsuarioController::class,'index']);
 
