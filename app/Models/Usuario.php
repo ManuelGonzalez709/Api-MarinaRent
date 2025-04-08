@@ -6,6 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
 {
+
+    protected $table = 'usuarios';
+
+    protected $fillable = [
+        'Nombre',
+        'Apellidos',
+        'Fecha_nacimiento',
+        'Email',
+        'Tipo',
+        'Password'
+    ];
+
      public function publicaciones()
      {
          return $this->hasMany(Publicacion::class);
