@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\Hash;
 
 
 
+Route::middleware('auth:sanctum')->group(function () {
+
+    // CRUD para usuarios, publicaciones y reservas
+    Route::apiResource('usuarios', UsuarioController::class);
+    Route::apiResource('publicaciones', PublicacionController::class);
+    Route::apiResource('reservas', ReservaController::class);
+
+    //Usuario
+    Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
+    
+    //Reservas
+    Route::get('reservas/usuario/{usuarioId}', [ReservaController::class, 'getReservasPorUsuario']);
+
+});
+
+////Register
 Route::post('register', function (Request $request) {
     $validated = $request->validate([
         'Nombre' => 'required|string|max:255',
@@ -48,10 +64,3 @@ Route::post('login', function (Request $request) {
     return response()->json(['token' => $token], 200);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
-
-    // CRUD para usuarios, publicaciones y reservas
-    Route::apiResource('usuarios', UsuarioController::class);
-    Route::apiResource('publicaciones', PublicacionController::class);
-    Route::apiResource('reservas', ReservaController::class);
-});

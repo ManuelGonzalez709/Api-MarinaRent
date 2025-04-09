@@ -13,6 +13,11 @@ class UsuarioController extends Controller
         return response()->json(data: $usuarios);
     }
 
+    public function obtenerUsuarioAutenticado()
+    {
+        $usuario = auth()->user();
+        return response()->json($usuario->only(['id']));
+    }
     /**
      * Store a newly created resource in storage.
      */

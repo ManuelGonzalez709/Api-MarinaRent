@@ -21,10 +21,10 @@ class Usuario extends Model
         'Password'
     ];
 
-     public function publicaciones()
-     {
+    public function publicaciones()
+    {
          return $this->hasMany(Publicacion::class);
-     }
+    }
  
      // Relación uno a muchos con reservas
      public function reservas()
