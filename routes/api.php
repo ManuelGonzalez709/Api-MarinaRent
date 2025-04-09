@@ -6,18 +6,35 @@ use App\Http\Controllers\UsuarioController;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+
+
+Route::post('register', function (Request $request) {
+    $validated = $request->validate([
+        'Nombre' => 'required|string|max:255',
+        'Apellidos' => 'required|string|max:255',
+        'Fecha_nacimiento' => 'required|date',
+        'Email' => 'required|email|unique:usuarios,Email',
+        'Password' => 'required|string|min:6|confirmed', 
+    ]);
+
+    // Crear un nuevo usuario
+    $usuario = Usuario::create([
+        'Nombre' => $validated['Nombre'],
+        'Apellidos' => $validated['Apellidos'],
+        'Fecha_nacimiento' => $validated['Fecha_nacimiento'],
+        'Email' => $validated['Email'],
+        'Password' => Hash::make($validated['Password']),
+    ]);
+
+    // Crear un token para el nuevo usuario
+    $token = $usuario->createToken('token-api')->plainTextToken;
+
+    // Devolver el token al cliente
+    return response()->json(['token' => $token], 201);
+});
+
 
 Route::post('login', function (Request $request) {
     $usuario = Usuario::where('Email', $request->email)->first();
@@ -32,10 +49,6 @@ Route::post('login', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-
-
-   
-
 
     // CRUD para usuarios, publicaciones y reservas
     Route::apiResource('usuarios', UsuarioController::class);
