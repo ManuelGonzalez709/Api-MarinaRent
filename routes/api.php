@@ -4,6 +4,7 @@ use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UsuarioController;
 use App\Models\Usuario;
+use App\Http\Controllers\ImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +23,9 @@ Route::middleware('auth:sanctum')->group(function () {
     
     //Reservas
     Route::get('reservas/usuario/{usuarioId}', [ReservaController::class, 'getReservasPorUsuario']);
+
+    //Subida de Imagenes
+    Route::post('upload', [ImageController::class, 'upload']);
 
 });
 
