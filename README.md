@@ -12,7 +12,7 @@ Esta API implementa autenticación mediante tokens, permitiendo que solo usuario
 
 - Para obtener acceso, el usuario debe registrarse o iniciar sesión.
 - Se genera un **token de acceso** que debe ser enviado en cada petición protegida mediante el header:
-- 
+
 ## 🧪 Seeders
 El proyecto incluye seeders automáticos para generar datos falsos de prueba (usuarios, amarres, reservas, etc.). Esto facilita la prueba sin necesidad de introducir datos manualmente.
 
