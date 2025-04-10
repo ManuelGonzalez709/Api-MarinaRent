@@ -18,4 +18,4 @@ Una API desarrollada en **Laravel** para la carga y gestión de imágenes. Permi
 Clona este repositorio en tu máquina local:
 
 ```bash
-git clone https://github.com/tuusuario/nombre-del-repositorio.git
+git clone https://github.com/ManuelGonzalez709/Api-MarinaRent.git
