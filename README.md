@@ -19,6 +19,22 @@ El proyecto incluye seeders automáticos para generar datos falsos de prueba (us
 php artisan migrate:fresh --seed
 
 ---
+
+### CRUD Operations
+- `GET /api/users` → List users
+- `POST /api/users` → Create user
+- `GET /api/reservations` → List reservations
+- `POST /api/reservations` → Create reservation
+- `GET /api/publications` → List publications
+- `POST /api/publications` → Create publication
+
+### Upload
+- `POST /api/upload` → Upload an image (multipart/form-data)
+
+### Headers for protected routes
+```http
+Authorization: Bearer {YOUR_TOKEN}
+
 ## Clonacion del Repositorio
 
 ``` bash
