@@ -18,6 +18,8 @@ El proyecto incluye seeders automáticos para generar datos falsos de prueba (us
 
 php artisan migrate:fresh --seed
 
+---
+## Clonacion del Repositorio
 
 ``` bash
 git clone https://github.com/ManuelGonzalez709/Api-MarinaRent.git
