@@ -1,6 +1,6 @@
-# 🚀 API de Subida de Imágenes en Laravel
+# 🚀 API Proyecto Final MarinaRent
 
-Una API desarrollada en **Laravel** para la carga y gestión de imágenes. Permite a los usuarios subir imágenes y recibir una URL pública para acceder a ellas.
+La API **MarinaRent** es un proyecto desarrollado en **Laravel** para gestionar el alquiler de amarres y servicios en un puerto deportivo. Esta API está diseñada para gestionar usuarios, reservas, y servicios relacionados con los amarres.
 
 ![Laravel](https://img.shields.io/badge/Laravel-v8.x-brightgreen)
 
