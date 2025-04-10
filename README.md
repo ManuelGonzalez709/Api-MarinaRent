@@ -19,3 +19,12 @@ Clona este repositorio en tu máquina local:
 
 ```bash
 git clone https://github.com/ManuelGonzalez709/Api-MarinaRent.git
+
+---
+
+## 🧪 Seeders
+
+El proyecto incluye **seeders automáticos** que generan datos de prueba (como usuarios, amarres, reservas, etc.) al ejecutar las migraciones. Esto facilita la prueba de la API sin necesidad de insertar registros manualmente.
+
+```bash
+php artisan migrate:fresh --seed
