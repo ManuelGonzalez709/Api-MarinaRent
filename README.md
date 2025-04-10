@@ -34,6 +34,3 @@ php artisan migrate:fresh --seed
 ### Headers for protected routes
 ```http
 Authorization: Bearer {YOUR_TOKEN}
-
-
-
