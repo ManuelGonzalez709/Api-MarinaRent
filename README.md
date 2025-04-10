@@ -35,9 +35,5 @@ php artisan migrate:fresh --seed
 ```http
 Authorization: Bearer {YOUR_TOKEN}
 
-## Clonacion del Repositorio
-
-``` bash
-git clone https://github.com/ManuelGonzalez709/Api-MarinaRent.git
 
 
