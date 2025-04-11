@@ -23,10 +23,16 @@ php artisan migrate:fresh --seed
 ### CRUD Operations
 - `GET /api/users` → List users
 - `POST /api/users` → Create user
+- `PUT /api/users/{id}` → Update user
+- `DELETE /api/users/{id}` → Delete user
 - `GET /api/reservations` → List reservations
 - `POST /api/reservations` → Create reservation
+- `PUT /api/reservations/{id}` → Update reservation
+- `DELETE /api/reservations/{id}` → Delete reservation
 - `GET /api/publications` → List publications
 - `POST /api/publications` → Create publication
+- `PUT /api/publications/{id}` → Update publication
+- `DELETE /api/publications/{id}` → Delete publication
 
 ### Upload
 - `POST /api/upload` → Upload an image (multipart/form-data)
