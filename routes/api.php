@@ -28,8 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
     //Subida de Imagenes
     Route::post('upload', [ImageController::class, 'upload']);
 
-    //Subida de Correo//
-
     // Ruta para enviar el correo con el enlace de restablecimiento de contraseña
     Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento');
 
