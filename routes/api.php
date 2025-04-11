@@ -8,7 +8,8 @@ use App\Http\Controllers\ImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
-
+use App\Http\Controllers\RestablecerPasswordController;
+use App\Http\Controllers\RestablecerPasswordEmailController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -20,14 +21,27 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
-    
+
     //Reservas
     Route::get('reservas/usuario/{usuarioId}', [ReservaController::class, 'getReservasPorUsuario']);
 
     //Subida de Imagenes
     Route::post('upload', [ImageController::class, 'upload']);
 
+    //Subida de Correo//
+
+    // Ruta para enviar el correo con el enlace de restablecimiento de contraseña
+    Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento');
+
+
 });
+
+// Ruta para mostrar el formulario de restablecimiento de contraseña
+Route::get('restablecer-password/{email}', [RestablecerPasswordEmailController::class, 'mostrarFormulario'])->name('mostrar.formulario.restablecer');
+
+// Ruta para procesar el restablecimiento de la contraseña
+Route::post('restablecer-password', [RestablecerPasswordEmailController::class, 'restablecer'])->name('restablecer.password');
+
 
 ////Register
 Route::post('register', function (Request $request) {
@@ -36,7 +50,7 @@ Route::post('register', function (Request $request) {
         'Apellidos' => 'required|string|max:255',
         'Fecha_nacimiento' => 'required|date',
         'Email' => 'required|email|unique:usuarios,Email',
-        'Password' => 'required|string|min:6|confirmed', 
+        'Password' => 'required|string|min:6|confirmed',
     ]);
 
     // Crear un nuevo usuario
