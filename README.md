@@ -34,9 +34,7 @@ php artisan migrate:fresh --seed
 - `POST /api/publications` → Create publication
 - `PUT /api/publications/{id}` → Update publication
 - `DELETE /api/publications/{id}` → Delete publication
-
-### Upload
-- `POST /api/upload` → Upload an image (multipart/form-data)
+- `POST /api/upload` → Upload an image (multipart/form-data). This route allows you to upload images related to publications or any other   entities that require images in your application.
 
 ### Headers for protected routes
 ```http
