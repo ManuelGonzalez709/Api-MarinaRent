@@ -6,31 +6,41 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+
 
 class RestablecerPasswordEmailController extends Controller
 {
     // Método para mostrar el formulario de restablecimiento
-    public function mostrarFormulario($email)
+    public function mostrarFormulario($token, Request $request)
     {
+        $email = $request->query('email'); // obtienes el email de los parámetros de la URL
+
         // Verificar si el correo está registrado con el modelo 'Usuario'
         $usuario = Usuario::where('Email', $email)->first();
 
         // Si no se encuentra el usuario, devolver un mensaje de error
         if (!$usuario) {
-            return redirect()->route('login')->with('error', 'No se encontró un usuario con ese correo.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no encontrado: ' . $email
+            ]);
         }
 
         // Si el correo es válido, devolver la vista para restablecer la contraseña
-        return view('restablecer')->with('email', $email); // Aquí se cambia 'auth.restablecer' a 'restablecer'
+        return view('restablecer')->with([
+            'email' => $email,
+            'token' => $token
+        ]);
     }
+
 
     public function restablecer(Request $request)
     {
-        // Validación manual para controlar el formato de respuesta
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
+            'token' => 'required',
             'password' => 'required|confirmed',
-            'password_confirmation' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -41,26 +51,37 @@ class RestablecerPasswordEmailController extends Controller
             ], 422);
         }
 
-        // Buscar usuario por email
+        $registro = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$registro || !Hash::check($request->token, $registro->token)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token inválido o expirado.'
+            ], 403);
+        }
+
         $usuario = Usuario::where('Email', $request->email)->first();
 
         if (!$usuario) {
             return response()->json([
                 'success' => false,
-                'message' => 'No se encontró un usuario con ese correo.'
+                'message' => 'Usuario no encontrado.'
             ], 404);
         }
 
-        // Guardar la nueva contraseña
         $usuario->Password = bcrypt($request->password);
         $usuario->save();
+
+        // Eliminar el token después de usarlo
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Contraseña restablecida correctamente.'
         ]);
     }
-
 
 
 }

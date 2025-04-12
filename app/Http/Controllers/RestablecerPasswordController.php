@@ -6,17 +6,18 @@ use Illuminate\Http\Request;
 use App\Mail\RestablecerPass;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class RestablecerPasswordController extends Controller
 {
     public function enviarRestablecimiento(Request $request)
     {
-        // Validación de los datos recibidos
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'required|email|exists:usuarios,Email',
         ]);
 
-        // Si la validación falla, retorna un error
         if ($validator->fails()) {
             return response()->json([
                 'error' => 'Datos inválidos',
@@ -24,26 +25,24 @@ class RestablecerPasswordController extends Controller
             ], 422);
         }
 
-        // Crear el enlace de restablecimiento (puedes generar un enlace real o simulado)
-        $enlaceRestablecimiento = url('api/restablecer-password/' . $request->email);
+        $token = Str::random(64);
 
-        // Datos a enviar al correo
-        $data = [
-            'nombre' => 'Usuario', // Podrías obtener el nombre del usuario desde la base de datos
-            'enlace' => $enlaceRestablecimiento,
-        ];
+        // Guardar el token en la tabla password_resets
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => now(),
+            ]
+        );
 
-        try {
-            // Enviar el correo con texto plano
-            Mail::raw("Hola, {$data['nombre']}\n\nHas solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para restablecerla:\n\n{$data['enlace']}\n\nSi no solicitaste el restablecimiento de contraseña, ignora este correo.", function ($message) use ($request) {
-                $message->to($request->email)
-                        ->subject('Restablecer Contraseña');
-            });
+        $enlaceRestablecimiento = url('api/restablecer-password/' . $token . '?email=' . urlencode($request->email));
 
-            return response()->json(['success' => 'Correo enviado para restablecer la contraseña'], 200);
-        } catch (\Exception $e) {
-            // Si ocurre un error, manejar la excepción
-            return response()->json(['error' => 'Hubo un problema al enviar el correo', 'message' => $e->getMessage()], 500);
-        }
+        Mail::raw("Hola,\n\nHaz clic en el siguiente enlace para restablecer tu contraseña:\n\n{$enlaceRestablecimiento}", function ($message) use ($request) {
+            $message->to($request->email)
+                ->subject('Restablecer Contraseña');
+        });
+
+        return response()->json(['success' => 'Correo enviado para restablecer la contraseña'], 200);
     }
 }

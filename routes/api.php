@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\RestablecerPasswordController;
 use App\Http\Controllers\RestablecerPasswordEmailController;
 
-
 Route::middleware('auth:sanctum')->group(function () {
 
     // CRUD para usuarios, publicaciones y reservas
@@ -29,16 +28,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('upload', [ImageController::class, 'upload']);
 
     // Ruta para enviar el correo con el enlace de restablecimiento de contraseña
-    Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento');
-
+   
 
 });
 
-// Ruta para mostrar el formulario de restablecimiento de contraseña
 Route::get('restablecer-password/{email}', [RestablecerPasswordEmailController::class, 'mostrarFormulario'])->name('mostrar.formulario.restablecer');
-
-// Ruta para procesar el restablecimiento de la contraseña
 Route::post('restablecer-password', [RestablecerPasswordEmailController::class, 'restablecer'])->name('restablecer.password');
+Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento');
 
 
 ////Register

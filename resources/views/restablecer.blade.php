@@ -1,34 +1,49 @@
-<!-- resources/views/restablecer.blade.php -->
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restablecer Contraseña</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <h2>Restablecer Contraseña</h2>
+    <div class="container">
+        <div class="form-container">
+            <h2 class="text-center">Restablecer Contraseña</h2>
+            <form method="POST" action="{{ route('restablecer.password') }}">
+                @csrf
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="email" value="{{ $email }}">
 
-    <!-- Mostrar los errores de validación si existen -->
-  
+                <div class="mb-3">
+                    <label for="password" class="form-label">Nueva Contraseña</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                </div>
 
-    <form action="{{ route('restablecer.password') }}" method="POST">
-        @csrf
-        <!-- Campo oculto para el email -->
-        <input type="hidden" name="email" value="{{ $email }}">
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+                </div>
 
-        <!-- Campo para la nueva contraseña -->
-        <label for="password">Nueva Contraseña</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-
-        <!-- Confirmación de la nueva contraseña -->
-        <label for="password_confirmation">Confirmar Nueva Contraseña</label>
-        <input type="password" id="password_confirmation" name="password_confirmation" required>
-        <br>
-
-        <button type="submit">Aplicar Cambios</button>
-    </form>
+                <button type="submit" class="btn btn-primary w-100">Restablecer Contraseña</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
