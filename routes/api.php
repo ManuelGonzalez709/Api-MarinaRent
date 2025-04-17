@@ -32,9 +32,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
+// Esti es oara restablecer la contraseña
+// envia al correo el enlace para restablecer la contraseña
+Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento'); 
+//Muestra el formulario al hacer click en el enlace del correo
 Route::get('restablecer-password/{email}', [RestablecerPasswordEmailController::class, 'mostrarFormulario'])->name('mostrar.formulario.restablecer');
+// Restablece la contraseña al dar click en restablecer contraseña en la pagina de restablecimiento de contraseña
 Route::post('restablecer-password', [RestablecerPasswordEmailController::class, 'restablecer'])->name('restablecer.password');
-Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento');
 
 
 ////Register
