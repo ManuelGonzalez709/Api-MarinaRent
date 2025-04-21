@@ -12,7 +12,13 @@ use App\Http\Controllers\RestablecerPasswordController;
 use App\Http\Controllers\RestablecerPasswordEmailController;
 
 Route::middleware('auth:sanctum')->group(function () {
-
+    /*
+    if() (auth()->user()->rol == 'admin') {
+        Route::get('usuarios', [UsuarioController::class, 'index']);
+    } else {
+        Route::get('usuarios/{id}', [UsuarioController::class, 'show']);
+    }*/
+    
     // CRUD para usuarios, publicaciones y reservas
     Route::apiResource('usuarios', UsuarioController::class);
     Route::apiResource('publicaciones', PublicacionController::class);
