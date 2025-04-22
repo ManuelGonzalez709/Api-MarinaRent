@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Publicacion;
 use Illuminate\Http\Request;
 
 class PublicacionController extends Controller
@@ -11,7 +12,19 @@ class PublicacionController extends Controller
      */
     public function index()
     {
-        //
+        $publicaciones = Publicacion::all();
+        return response()->json(data: $publicaciones);
+    }
+
+    public function obtenerInformativos()
+    {
+        $publicaciones = Publicacion::where('tipo', 'informativo')->get();
+
+        if ($publicaciones->isEmpty()) {
+            return response()->json([], 404);
+        }
+
+        return response()->json($publicaciones);
     }
 
     /**
@@ -25,10 +38,16 @@ class PublicacionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
+   public function show(string $id)
+{
+    $publicacion = Publicacion::find($id);
+
+    if (!$publicacion) {
+        return response()->json(['message' => 'Publicación no encontrada'], 404);
     }
+
+    return response()->json($publicacion);
+}
 
     /**
      * Update the specified resource in storage.

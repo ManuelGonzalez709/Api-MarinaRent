@@ -23,7 +23,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('usuarios', UsuarioController::class);
     Route::apiResource('publicaciones', PublicacionController::class);
     Route::apiResource('reservas', ReservaController::class);
-
+    
+    // 
+    Route::get('informativos', [PublicacionController::class, 'obtenerInformativos']);
+    
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
 
@@ -33,7 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
     //Subida de Imagenes
     Route::post('upload', [ImageController::class, 'upload']);
 
-    // Ruta para enviar el correo con el enlace de restablecimiento de contraseña
 
 });
 
