@@ -24,8 +24,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('publicaciones', PublicacionController::class);
     Route::apiResource('reservas', ReservaController::class);
     
-    // 
+    // Ruta para obtener publicaciones Informativas y Alquilables
     Route::get('informativos', [PublicacionController::class, 'obtenerInformativos']);
+    Route::get('alquilables', [PublicacionController::class, 'obtenerAlquilables']);
+
     
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);

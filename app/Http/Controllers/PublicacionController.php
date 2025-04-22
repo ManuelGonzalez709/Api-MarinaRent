@@ -26,6 +26,16 @@ class PublicacionController extends Controller
 
         return response()->json($publicaciones);
     }
+    public function obtenerAlquilables()
+    {
+        $publicaciones = Publicacion::where('tipo', 'alquilable')->get();
+
+        if ($publicaciones->isEmpty()) {
+            return response()->json([], 404);
+        }
+
+        return response()->json($publicaciones);
+    }
 
     /**
      * Store a newly created resource in storage.
