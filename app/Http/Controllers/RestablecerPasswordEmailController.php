@@ -51,7 +51,7 @@ class RestablecerPasswordEmailController extends Controller
             ], 422);
         }
 
-        $registro = DB::table('password_reset_tokens')
+        $registro = DB::table('password_resets')
             ->where('email', $request->email)
             ->first();
 
@@ -75,7 +75,7 @@ class RestablecerPasswordEmailController extends Controller
         $usuario->save();
 
         // Eliminar el token después de usarlo
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        DB::table('password_resets')->where('email', $request->email)->delete();
 
         return response()->json([
             'success' => true,

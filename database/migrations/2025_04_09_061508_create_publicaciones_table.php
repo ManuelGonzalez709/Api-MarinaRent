@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id();
-            $table->string('Titulo');
-            $table->string('Descripcion');
-            $table->datetime('Fecha_publicacion');
-            $table->enum('Tipo', ['alquilable', 'informativo']);
-            $table->integer('Precio')->nullable();
-            $table->text('Imagen')->nullable();
+            $table->string('titulo');
+            $table->string('descripcion');
+            $table->datetime('fecha_evento');
+            $table->enum('tipo', ['alquilable', 'informativo']);
+            $table->integer('precio')->nullable();
+            $table->text('imagen')->nullable();
+            $table->integer('aforo_maximo')->nullable();
             $table->timestamps();
         });
     }

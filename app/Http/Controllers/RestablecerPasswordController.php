@@ -28,7 +28,7 @@ class RestablecerPasswordController extends Controller
         $token = Str::random(64);
 
         // Guardar el token en la tabla password_resets
-        DB::table('password_reset_tokens')->updateOrInsert(
+        DB::table('password_resets')->updateOrInsert(
             ['email' => $request->email],
             [
                 'token' => Hash::make($token),

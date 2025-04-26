@@ -19,10 +19,11 @@ class PublicacionFactory extends Factory
         return [
             'Titulo' => $this->faker->sentence,  
             'Descripcion' => $this->faker->paragraph,  
-            'Fecha_publicacion' => $this->faker->date, 
+            'Fecha_evento' => $this->faker->date,
             'Tipo' => $this->faker->randomElement(['alquilable','informativo']),  
             'Precio' => $this->faker->numberBetween(100, 10000), 
             'Imagen' => $this->faker->imageUrl(640, 480, 'business', true),  
+            'Aforo_maximo' => $this->faker->numberBetween(100, 500), 
         ];
     }
 }

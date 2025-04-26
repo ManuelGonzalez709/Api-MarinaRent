@@ -3,13 +3,15 @@
 use App\Http\Controllers\PublicacionController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UsuarioController;
-use App\Models\Usuario;
 use App\Http\Controllers\ImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\RestablecerPasswordController;
 use App\Http\Controllers\RestablecerPasswordEmailController;
+use App\Models\Usuario;
+use App\Models\Publicacion;
+use App\Models\Reserva;
 
 Route::middleware('auth:sanctum')->group(function () {
     /*
@@ -35,10 +37,19 @@ Route::middleware('auth:sanctum')->group(function () {
     //Reservas
     Route::get('reservas/usuario/{usuarioId}', [ReservaController::class, 'getReservasPorUsuario']);
 
-    //Subida de Imagenes
+    //Subida de Imagenes (Imagenes singulares)
     Route::post('upload', [ImageController::class, 'upload']);
 
+    //Rellenamiento de datos para la base de datos
+    
+    
+});
 
+Route::post('generarDatos', function () {
+    Publicacion::factory(10)->create();
+    Usuario::factory(10)->create();
+    Reserva::factory(10)->create();
+    return response()->json(['message' => '10 publicaciones creadas correctamente.']);
 });
 
 // Esti es oara restablecer la contraseña

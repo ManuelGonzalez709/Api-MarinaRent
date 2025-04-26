@@ -16,9 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger("usuario_id");
             $table->unsignedBigInteger("publicacion_id");
             $table->datetime('fecha_reserva');
+            $table->integer('total_pagar')->nullable();
+            $table->integer('personas')->nullable();
             $table->timestamps();
             
-            $table->foreign('usuario_id')->references(columns: 'id')->on('usuarios')->onDelete('cascade');
+            // CORREGIDO aquí
+            $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('cascade');
             $table->foreign('publicacion_id')->references('id')->on('publicaciones')->onDelete('cascade');
         });
     }

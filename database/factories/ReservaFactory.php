@@ -22,6 +22,8 @@ class ReservaFactory extends Factory
             'usuario_id' => Usuario::factory(),  // Relacionamos con un usuario aleatorio
             'publicacion_id' => Publicacion::factory(),  // Relacionamos con una publicación aleatoria
             'fecha_reserva' => $this->faker->dateTimeBetween('now', '+1 year'),  // Fecha de reserva en el futuro, hasta un año
+            'total_pagar' => $this->faker->numberBetween(100, 10000),  // Monto a pagar aleatorio
+            'personas' => $this->faker->numberBetween(1, 4),  // Número de personas en la reserva
         ];
     }
 }
