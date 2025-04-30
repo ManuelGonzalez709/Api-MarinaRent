@@ -33,8 +33,9 @@ Route::middleware('auth:sanctum')->group(function () {
     
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
-
+    
     //Reservas
+    Route::post('disponibilidadReserva', [ReservaController::class, 'getDisponibilidad']);
     Route::get('reservas/usuario/{usuarioId}', [ReservaController::class, 'getReservasPorUsuario']);
 
     //Subida de Imagenes (Imagenes singulares)
