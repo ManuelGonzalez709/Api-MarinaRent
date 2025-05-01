@@ -12,10 +12,11 @@ class Publicacion extends Model
     protected $fillable = [
         'Titulo',
         'Descripcion',
-        'Fecha_publicacion',
+        'Fecha_evento',
         "Tipo",
         "Precio",
-        "Imagen"
+        "Imagen",
+        "Aforo_maximo",
     ];
 
     public function usuario()

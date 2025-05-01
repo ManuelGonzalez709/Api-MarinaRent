@@ -14,7 +14,8 @@ class ReservaController extends Controller
      */
     public function index()
     {
-        //
+        $reservas = Reserva::all();
+        return response()->json($reservas);
     }
 
 
@@ -29,8 +30,45 @@ class ReservaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validar sin usuario_id
+        $validated = $request->validate([
+            'publicacion_id' => 'required|exists:publicaciones,id',
+            'hora_reserva' => 'required|date_format:H:i', // por ejemplo '16:00'
+            'total_pagar' => 'nullable|integer',
+            'personas' => 'nullable|integer|min:1|max:4',
+        ]);
+
+        // Obtener el usuario autenticado
+        $usuario = auth()->user();
+
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        // Obtener la publicación
+        $publicacion = Publicacion::findOrFail($validated['publicacion_id']);
+
+        // Formar fecha completa con fecha_evento + hora_reserva
+        $fechaEvento = \Illuminate\Support\Carbon::parse($publicacion->fecha_evento)->format('Y-m-d');
+        $hora = str_pad(substr($validated['hora_reserva'], 0, 2), 2, '0', STR_PAD_LEFT) . ':00:00';
+        $fechaReserva = $fechaEvento . ' ' . $hora;
+
+        // Crear reserva
+        $reserva = Reserva::create([
+            'usuario_id' => $usuario->id,
+            'publicacion_id' => $validated['publicacion_id'],
+            'fecha_reserva' => $fechaReserva,
+            'total_pagar' => $validated['total_pagar'] ?? null,
+            'personas' => $validated['personas'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Reserva creada correctamente',
+            'reserva' => $reserva
+        ], 201);
     }
+
+
     public function getCapacidadDisponible(Request $request)
     {
         $idPublicacion = $request->input('idPublicacion');
