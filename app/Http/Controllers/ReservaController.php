@@ -19,6 +19,10 @@ class ReservaController extends Controller
         return response()->json($reservas);
     }
 
+    public function cancelarReservaUsuario($idReserva)
+    {
+
+    }
 
     public function getReservasPorUsuario(Request $request)
     {
@@ -173,6 +177,18 @@ class ReservaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $reserva = Reserva::find($id);
+
+        if (!$reserva) {
+            return response()->json(['error' => 'Reserva no encontrada'], 404);
+        }
+
+        if ($reserva->usuario_id !== auth()->id()) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        $reserva->delete();
+
+        return response()->json(['mensaje' => 'Reserva cancelada correctamente']);
     }
 }
