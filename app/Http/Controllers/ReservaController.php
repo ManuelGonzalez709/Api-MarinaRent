@@ -6,6 +6,7 @@ use App\Models\Reserva;
 use App\Models\Publicacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ReservaController extends Controller
 {
@@ -19,12 +20,21 @@ class ReservaController extends Controller
     }
 
 
-    public function getReservasPorUsuario($usuarioId)
+    public function getReservasPorUsuario(Request $request)
     {
-        $reservas = Reserva::where('usuario_id', $usuarioId)->get();
+        $usuario = Auth::guard('sanctum')->user();
+
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        // Cargar reservas junto con el título de la publicación
+        $reservas = $usuario->reservas()->with(['publicacion:id,titulo'])->get();
+
 
         return response()->json($reservas);
     }
+
     /**
      * Store a newly created resource in storage.
      */
