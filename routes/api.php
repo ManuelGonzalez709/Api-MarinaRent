@@ -31,7 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('informativos', [PublicacionController::class, 'obtenerInformativos']);
     Route::get('alquilables', [PublicacionController::class, 'obtenerAlquilables']);
 
-
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
 
@@ -56,7 +55,7 @@ Route::get('horaFecha', function () {
     $now = Carbon::now('Europe/Madrid'); // Establece la zona horaria manualmente
 
     return response()->json([
-        'fecha' => $now->format('Y/m/d'),
+        'fecha' => $now->format('Y-m-d'),
         'hora' => $now->format('H:i:s')
     ]);
 });
