@@ -12,6 +12,7 @@ use App\Http\Controllers\RestablecerPasswordEmailController;
 use App\Models\Usuario;
 use App\Models\Publicacion;
 use App\Models\Reserva;
+use Illuminate\Support\Carbon;
 
 Route::middleware('auth:sanctum')->group(function () {
     /*
@@ -20,20 +21,20 @@ Route::middleware('auth:sanctum')->group(function () {
     } else {
         Route::get('usuarios/{id}', [UsuarioController::class, 'show']);
     }*/
-    
+
     // CRUD para usuarios, publicaciones y reservas
     Route::apiResource('usuarios', UsuarioController::class);
     Route::apiResource('publicaciones', PublicacionController::class);
     Route::apiResource('reservas', ReservaController::class);
-    
+
     // Ruta para obtener publicaciones Informativas y Alquilables
     Route::get('informativos', [PublicacionController::class, 'obtenerInformativos']);
     Route::get('alquilables', [PublicacionController::class, 'obtenerAlquilables']);
 
-    
+
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
-    
+
     //Reservas
     Route::post('disponibilidadReserva', [ReservaController::class, 'getDisponibilidad']);
     Route::post('capacidadDisponible', [ReservaController::class, 'getCapacidadDisponible']);
@@ -41,26 +42,32 @@ Route::middleware('auth:sanctum')->group(function () {
     //Subida de Imagenes (Imagenes singulares)
     Route::post('upload', [ImageController::class, 'upload']);
 
-    //Rellenamiento de datos para la base de datos
-    
-    
+    //Funcion que usa el factory
+    Route::post('generarDatos', function () {
+        Publicacion::factory(10)->create();
+        Usuario::factory(10)->create();
+        Reserva::factory(10)->create();
+        return response()->json(['message' => '10 publicaciones creadas correctamente.']);
+    });
 });
 
-Route::post('generarDatos', function () {
-    Publicacion::factory(10)->create();
-    Usuario::factory(10)->create();
-    Reserva::factory(10)->create();
-    return response()->json(['message' => '10 publicaciones creadas correctamente.']);
+//Funcion para obtener la fecha y la hora del Server
+Route::get('horaFecha', function () {
+    $now = Carbon::now('Europe/Madrid'); // Establece la zona horaria manualmente
+
+    return response()->json([
+        'fecha' => $now->format('Y/m/d'),
+        'hora' => $now->format('H:i:s')
+    ]);
 });
 
-// Esti es oara restablecer la contraseña
+// Esto es para restablecer la contraseña
 // envia al correo el enlace para restablecer la contraseña
-Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento'); 
+Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'enviarRestablecimiento'])->name('enviar.restablecimiento');
 //Muestra el formulario al hacer click en el enlace del correo
 Route::get('restablecer-password/{email}', [RestablecerPasswordEmailController::class, 'mostrarFormulario'])->name('mostrar.formulario.restablecer');
 // Restablece la contraseña al dar click en restablecer contraseña en la pagina de restablecimiento de contraseña
 Route::post('restablecer-password', [RestablecerPasswordEmailController::class, 'restablecer'])->name('restablecer.password');
-
 
 ////Register
 Route::post('register', function (Request $request) {
@@ -88,7 +95,7 @@ Route::post('register', function (Request $request) {
     return response()->json(['token' => $token], 201);
 });
 
-
+//Metodo de Login
 Route::post('login', function (Request $request) {
     $usuario = Usuario::where('Email', $request->email)->first();
 
