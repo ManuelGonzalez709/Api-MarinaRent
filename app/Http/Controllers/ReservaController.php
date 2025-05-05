@@ -172,6 +172,28 @@ class ReservaController extends Controller
         //
     }
 
+    public function obtenerReservasDetalladas()
+    {
+        $reservas = Reserva::with(['usuario:id,Nombre,Apellidos', 'publicacion:id,titulo'])
+            ->get()
+            ->map(function ($reserva) {
+                $nombreCompleto = $reserva->usuario
+                    ? $reserva->usuario->Nombre . ' ' . $reserva->usuario->Apellidos
+                    : 'Desconocido';
+
+                return [
+                    'id' => $reserva->id,
+                    'nombre_usuario' => $nombreCompleto,
+                    'titulo_publicacion' => $reserva->publicacion->titulo ?? 'Sin título',
+                    'fecha_reserva' => $reserva->fecha_reserva,
+                    'estado' => Carbon::parse($reserva->fecha_reserva)->isFuture() ? 'pendiente' : 'pasada',
+                    'total_pagar' => $reserva->total_pagar ?? 0,
+                ];
+            });
+
+        return response()->json($reservas);
+    }
+
     /**
      * Remove the specified resource from storage.
      */

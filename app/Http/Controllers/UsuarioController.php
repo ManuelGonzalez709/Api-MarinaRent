@@ -13,6 +13,15 @@ class UsuarioController extends Controller
         return response()->json(data: $usuarios);
     }
 
+    public function obtenerAdmin()
+    {
+        $usuario = auth()->user();
+
+        return response()->json([
+            'is_admin' => $usuario->Tipo === 'admin'
+        ]);
+    }
+
     public function obtenerUsuarioAutenticado()
     {
         $usuario = auth()->user();
@@ -31,7 +40,7 @@ class UsuarioController extends Controller
      */
     public function show(int $id)
     {
-       
+
     }
 
     /**
@@ -39,7 +48,7 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        
+
     }
 
     /**
@@ -47,7 +56,7 @@ class UsuarioController extends Controller
      */
     public function destroy(string $id)
     {
-        
+
     }
 }
 

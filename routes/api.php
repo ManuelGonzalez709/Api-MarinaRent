@@ -33,11 +33,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
+    Route::get('isAdmin', [UsuarioController::class, 'obtenerAdmin']);
 
     //Reservas
     Route::post('disponibilidadReserva', [ReservaController::class, 'getDisponibilidad']);
     Route::post('capacidadDisponible', [ReservaController::class, 'getCapacidadDisponible']);
     Route::get('obtenerReservasUsuario', [ReservaController::class, 'getReservasPorUsuario']);
+    Route::get('obtenerReservasDetalladas', [ReservaController::class, 'obtenerReservasDetalladas']);
+
     //Subida de Imagenes (Imagenes singulares)
     Route::post('upload', [ImageController::class, 'upload']);
 
