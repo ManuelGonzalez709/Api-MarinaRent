@@ -146,12 +146,10 @@ class PublicacionController extends Controller
                 'imagenes_existentes' => 'sometimes|array',
                 'imagenes_existentes.*' => 'string'
             ]);
-
             $id = $request->input('id_publicacion');
             $publicacion = Publicacion::find($id);
 
             if (!$publicacion) {
-                Log::warning('Publicación no encontrada.', ['id' => $id]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Publicación no encontrada.'
@@ -174,7 +172,6 @@ class PublicacionController extends Controller
                 $rutaImagen = public_path('storage/photos/' . basename($imagen));
                 if (file_exists($rutaImagen)) {
                     unlink($rutaImagen);
-                    Log::info('Imagen eliminada del sistema de archivos.', ['imagen' => basename($imagen)]);
                 }
             }
 
@@ -196,8 +193,6 @@ class PublicacionController extends Controller
                 $errorMessages = [];
 
                 foreach ($request->file('imagenes') as $image) {
-                    Log::info('Subiendo imagen en actualización...', ['imagen' => $image->getClientOriginalName()]);
-
                     $responseData = $imageController->uploadImage($image);
 
                     if (!$responseData['success']) {
@@ -209,33 +204,21 @@ class PublicacionController extends Controller
                         Log::info('Imagen subida exitosamente.', ['ruta' => $responseData['path']]);
                     }
                 }
-
-                if ($uploadFailed) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Algunas imágenes no se pudieron subir.',
-                        'errors' => $errorMessages
-                    ], 400);
-                }
+                if ($uploadFailed) 
+                    return response()->json(['success' => false,'message' => 'Algunas imágenes no se pudieron subir.','errors' => $errorMessages], 400);
+                
             }
-
             // Guardar rutas actualizadas de imágenes
             $publicacion->Imagen = implode(';', $imagePaths);
             $publicacion->save();
-
-            Log::info('Publicación actualizada exitosamente.', ['id' => $publicacion->id]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Publicación actualizada exitosamente.',
                 'data' => $publicacion
             ]);
-        } catch (\Exception $e) {
-            Log::error('Error inesperado al actualizar la publicación.', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
 
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ocurrió un error inesperado.',
