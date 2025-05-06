@@ -130,12 +130,11 @@ class PublicacionController extends Controller
     public function update(Request $request)
     {
         Log::info('Iniciando método update para actualizar publicación', ['request' => $request->all()]);
-        try {
-            Log::info('Validando la solicitud...', ['request' => $request->all()]);
 
-            // Validación de los parámetros en el body
+        try {
+            // Validación de los datos
             $request->validate([
-                'id_publicacion' => 'required|integer|exists:publicaciones,id',  // Validación para el ID
+                'id_publicacion' => 'required|integer|exists:publicaciones,id',
                 'Titulo' => 'required|string|max:255',
                 'Descripcion' => 'required|string|max:1000',
                 'Fecha_evento' => 'required|date',
@@ -143,13 +142,12 @@ class PublicacionController extends Controller
                 'Precio' => 'required|numeric',
                 'Aforo_maximo' => 'required|numeric',
                 'imagenes' => 'sometimes|array|max:4',
-                'imagenes.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048'
+                'imagenes.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+                'imagenes_existentes' => 'sometimes|array',
+                'imagenes_existentes.*' => 'string'
             ]);
 
-            // Obtener el id_publicacion desde el body de la solicitud
             $id = $request->input('id_publicacion');
-
-            // Buscar la publicación por el ID
             $publicacion = Publicacion::find($id);
 
             if (!$publicacion) {
@@ -160,22 +158,27 @@ class PublicacionController extends Controller
                 ], 404);
             }
 
-            // Eliminar las imágenes antiguas antes de actualizar
-            if ($publicacion->imagen) {
-                $imagenesAntiguas = explode(';', $publicacion->imagen);
-                foreach ($imagenesAntiguas as $imagen) {
-                    // Extraemos el nombre del archivo de la URL
-                    $imagenNombre = basename($imagen); // Obtiene solo el nombre del archivo de la URL
-                    $rutaImagen = public_path('storage/photos/' . $imagenNombre);
+            // Obtener imágenes antiguas y existentes a conservar
+            $imagenesAntiguas = $publicacion->Imagen ? explode(';', $publicacion->Imagen) : [];
+            $imagenesExistentes = $request->input('imagenes_existentes', []);
 
-                    if (file_exists($rutaImagen)) {
-                        unlink($rutaImagen); // Elimina la imagen del sistema de archivos
-                        Log::info('Imagen eliminada del sistema de archivos.', ['imagen' => $imagenNombre]);
-                    }
+            // Asegurarse de que es array
+            if (is_string($imagenesExistentes)) {
+                $imagenesExistentes = explode(';', $imagenesExistentes);
+            }
+
+            // Determinar imágenes a eliminar
+            $imagenesAEliminar = array_diff($imagenesAntiguas, $imagenesExistentes);
+
+            foreach ($imagenesAEliminar as $imagen) {
+                $rutaImagen = public_path('storage/photos/' . basename($imagen));
+                if (file_exists($rutaImagen)) {
+                    unlink($rutaImagen);
+                    Log::info('Imagen eliminada del sistema de archivos.', ['imagen' => basename($imagen)]);
                 }
             }
 
-            // Actualizar los datos de la publicación
+            // Actualizar datos principales
             $publicacion->Titulo = $request->input('Titulo');
             $publicacion->Descripcion = $request->input('Descripcion');
             $publicacion->Fecha_evento = $request->input('Fecha_evento');
@@ -183,8 +186,10 @@ class PublicacionController extends Controller
             $publicacion->Precio = $request->input('Precio');
             $publicacion->Aforo_maximo = $request->input('Aforo_maximo');
 
-            $imagePaths = [];
+            // Inicializar lista con las imágenes que se conservan
+            $imagePaths = $imagenesExistentes;
 
+            // Subir nuevas imágenes si existen
             if ($request->hasFile('imagenes')) {
                 $imageController = new ImageController();
                 $uploadFailed = false;
@@ -206,20 +211,18 @@ class PublicacionController extends Controller
                 }
 
                 if ($uploadFailed) {
-                    Log::warning('Error en la subida de imágenes.', ['errores' => $errorMessages]);
                     return response()->json([
                         'success' => false,
                         'message' => 'Algunas imágenes no se pudieron subir.',
                         'errors' => $errorMessages
                     ], 400);
                 }
-
-                // Solo actualiza si hay nuevas imágenes
-                $publicacion->Imagen = implode(';', $imagePaths);
             }
 
-            // Guardar los cambios en la publicación
+            // Guardar rutas actualizadas de imágenes
+            $publicacion->Imagen = implode(';', $imagePaths);
             $publicacion->save();
+
             Log::info('Publicación actualizada exitosamente.', ['id' => $publicacion->id]);
 
             return response()->json([
@@ -240,11 +243,6 @@ class PublicacionController extends Controller
             ], 500);
         }
     }
-
-
-
-
-
 
     /**
      * Display the specified resource.
