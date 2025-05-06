@@ -16,10 +16,13 @@ use Illuminate\Support\Carbon;
 
 Route::middleware('auth:sanctum')->group(function () {
     /*
-    if() (auth()->user()->rol == 'admin') {
-        Route::get('usuarios', [UsuarioController::class, 'index']);
-    } else {
-        Route::get('usuarios/{id}', [UsuarioController::class, 'show']);
+    if (auth()->user()->Tipo == 'admin') {
+        Route::post('generarDatos', function () {
+            Publicacion::factory(10)->create();
+            Usuario::factory(10)->create();
+            Reserva::factory(10)->create();
+            return response()->json(['message' => '10 publicaciones creadas correctamente.']);
+        });
     }*/
 
     // CRUD para usuarios, publicaciones y reservas
@@ -30,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ruta para obtener publicaciones Informativas y Alquilables
     Route::get('informativos', [PublicacionController::class, 'obtenerInformativos']);
     Route::get('alquilables', [PublicacionController::class, 'obtenerAlquilables']);
+    Route::post('actualizar', [PublicacionController::class, 'update']);
 
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
@@ -44,13 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //Subida de Imagenes (Imagenes singulares)
     Route::post('upload', [ImageController::class, 'upload']);
 
-    //Funcion que usa el factory
-    Route::post('generarDatos', function () {
-        Publicacion::factory(10)->create();
-        Usuario::factory(10)->create();
-        Reserva::factory(10)->create();
-        return response()->json(['message' => '10 publicaciones creadas correctamente.']);
-    });
+
 });
 
 //Funcion para obtener la fecha y la hora del Server
