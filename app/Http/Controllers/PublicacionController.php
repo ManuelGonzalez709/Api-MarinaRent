@@ -204,9 +204,9 @@ class PublicacionController extends Controller
                         Log::info('Imagen subida exitosamente.', ['ruta' => $responseData['path']]);
                     }
                 }
-                if ($uploadFailed) 
-                    return response()->json(['success' => false,'message' => 'Algunas imágenes no se pudieron subir.','errors' => $errorMessages], 400);
-                
+                if ($uploadFailed)
+                    return response()->json(['success' => false, 'message' => 'Algunas imágenes no se pudieron subir.', 'errors' => $errorMessages], 400);
+
             }
             // Guardar rutas actualizadas de imágenes
             $publicacion->Imagen = implode(';', $imagePaths);
@@ -246,6 +246,35 @@ class PublicacionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $publicacion = Publicacion::find($id);
+
+        if (!$publicacion) {
+            return response()->json(['message' => 'Publicación no encontrada.'], 404);
+        }
+
+        try {
+            // Eliminar imágenes asociadas
+            if ($publicacion->imagen) {
+                $imagenes = explode(';', $publicacion->imagen);
+
+                foreach ($imagenes as $imagen) {
+                    $rutaImagen = public_path('storage/photos/' . basename($imagen));
+                    if (file_exists($rutaImagen)) {
+                        unlink($rutaImagen);
+                    }
+                }
+            }
+
+            // Eliminar la publicación
+            $publicacion->delete();
+
+            return response()->json(['message' => 'Publicación e imágenes eliminadas correctamente.'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al eliminar la publicación.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 }
