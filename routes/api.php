@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
     Route::get('isAdmin', [UsuarioController::class, 'obtenerAdmin']);
+    Route::post('usuarios/actualizar', [UsuarioController::class, 'actualizar']);
 
     //Reservas
     Route::post('disponibilidadReserva', [ReservaController::class, 'getDisponibilidad']);
