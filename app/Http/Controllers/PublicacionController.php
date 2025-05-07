@@ -248,9 +248,8 @@ class PublicacionController extends Controller
     {
         $publicacion = Publicacion::find($id);
 
-        if (!$publicacion) {
+        if (!$publicacion) 
             return response()->json(['message' => 'Publicación no encontrada.'], 404);
-        }
 
         try {
             // Eliminar imágenes asociadas
