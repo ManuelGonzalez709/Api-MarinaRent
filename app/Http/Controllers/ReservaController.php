@@ -189,6 +189,7 @@ class ReservaController extends Controller
 
         return response()->json([
             'id' => $reserva->id,
+            'usuario_id' => $reserva->usuario->id ?? null,
             'nombre_usuario' => $nombreCompleto,
             'titulo_publicacion' => $reserva->publicacion->titulo ?? 'Sin título',
             'fecha_reserva' => $reserva->fecha_reserva,
@@ -196,6 +197,7 @@ class ReservaController extends Controller
             'personas' => $reserva->personas,
         ]);
     }
+
 
 
     /**
