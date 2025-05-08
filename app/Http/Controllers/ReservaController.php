@@ -176,8 +176,27 @@ class ReservaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $reserva = Reserva::with(['usuario:id,Nombre,Apellidos', 'publicacion:id,titulo'])
+            ->find($id);
+
+        if (!$reserva) {
+            return response()->json(['error' => 'Reserva no encontrada'], 404);
+        }
+
+        $nombreCompleto = $reserva->usuario
+            ? $reserva->usuario->Nombre . ' ' . $reserva->usuario->Apellidos
+            : 'Desconocido';
+
+        return response()->json([
+            'id' => $reserva->id,
+            'nombre_usuario' => $nombreCompleto,
+            'titulo_publicacion' => $reserva->publicacion->titulo ?? 'Sin título',
+            'fecha_reserva' => $reserva->fecha_reserva,
+            'total_pagar' => $reserva->total_pagar ?? 0,
+            'personas' => $reserva->personas,
+        ]);
     }
+
 
     /**
      * Update the specified resource in storage.

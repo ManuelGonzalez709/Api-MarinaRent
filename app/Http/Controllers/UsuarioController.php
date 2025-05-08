@@ -64,8 +64,22 @@ class UsuarioController extends Controller
      */
     public function show(int $id)
     {
+        $usuario = Usuario::find($id);
 
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        return response()->json([
+            'id' => $usuario->id,
+            'Nombre' => $usuario->Nombre,
+            'Apellidos' => $usuario->Apellidos,
+            'Email' => $usuario->Email,
+            'Fecha_nacimiento' => $usuario->Fecha_nacimiento,
+            'Tipo' => $usuario->Tipo,
+        ]);
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -118,21 +132,21 @@ class UsuarioController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   /**
- * Remove the specified resource from storage.
- */
-public function destroy(string $id)
-{
-    $usuario = Usuario::find($id);
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $usuario = Usuario::find($id);
 
-    if (!$usuario) {
-        return response()->json(['error' => 'Usuario no encontrado'], 404);
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        $usuario->delete();
+
+        return response()->json(['message' => 'Usuario eliminado correctamente'], 200);
     }
-
-    $usuario->delete();
-
-    return response()->json(['message' => 'Usuario eliminado correctamente'], 200);
-}
 
 }
 
