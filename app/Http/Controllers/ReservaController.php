@@ -27,7 +27,6 @@ class ReservaController extends Controller
     public function getReservasPorUsuario(Request $request)
     {
         $usuario = Auth::guard('sanctum')->user();
-
         if (!$usuario) {
             return response()->json(['error' => 'Usuario no autenticado'], 401);
         }
@@ -38,6 +37,22 @@ class ReservaController extends Controller
 
         return response()->json($reservas);
     }
+
+    public function getReservasPorIdUsuario($id)
+    {
+        $usuario = \App\Models\Usuario::find($id);
+
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        // Cargar reservas junto con el título de la publicación
+        $reservas = $usuario->reservas()->with(['publicacion:id,titulo'])->get();
+
+        return response()->json($reservas);
+    }
+
+
 
     /**
      * Store a newly created resource in storage.
