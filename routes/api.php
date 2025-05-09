@@ -70,6 +70,8 @@ Route::post('enviar-restablecimiento', [RestablecerPasswordController::class, 'e
 Route::get('restablecer-password/{email}', [RestablecerPasswordEmailController::class, 'mostrarFormulario'])->name('mostrar.formulario.restablecer');
 // Restablece la contraseña al dar click en restablecer contraseña en la pagina de restablecimiento de contraseña
 Route::post('restablecer-password', [RestablecerPasswordEmailController::class, 'restablecer'])->name('restablecer.password');
+//Retorna la vista de Success
+Route::get('password-reset-success', function () {return view('password-reset-success');})->name('password.reset.success');
 
 ////Register
 Route::post('register', function (Request $request) {

@@ -77,10 +77,7 @@ class RestablecerPasswordEmailController extends Controller
         // Eliminar el token después de usarlo
         DB::table('password_resets')->where('email', $request->email)->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Contraseña restablecida correctamente.'
-        ]);
+        return redirect()->route('password.reset.success');
     }
 
 
