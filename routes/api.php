@@ -35,10 +35,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('alquilables', [PublicacionController::class, 'obtenerAlquilables']);
     Route::post('actualizar', [PublicacionController::class, 'update']);
 
+
     //Usuario
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
     Route::get('isAdmin', [UsuarioController::class, 'obtenerAdmin']);
     Route::post('usuarios/actualizar', [UsuarioController::class, 'actualizar']);
+    Route::post('mailTo', [UsuarioController::class, 'enviarCorreoPersonalizado']);
 
     //Reservas
     Route::post('disponibilidadReserva', [ReservaController::class, 'getDisponibilidad']);

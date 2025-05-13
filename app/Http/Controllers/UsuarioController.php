@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CorreoPersonalizado;
 class UsuarioController extends Controller
 {
     public function index()
@@ -58,6 +60,31 @@ class UsuarioController extends Controller
 
         return response()->json(['usuario' => $usuario], 201);
     }
+    /**
+     * Envia un correo electrónico personalizado al usuario.
+     * @param \Illuminate\Http\Request $request
+     */
+    
+
+    public function enviarCorreoPersonalizado(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'mensaje' => 'required|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'Datos inválidos',
+                'messages' => $validator->errors()
+            ], 422);
+        }
+
+        Mail::to($request->email)->send(new CorreoPersonalizado($request->mensaje));
+
+        return response()->json(['success' => 'Correo enviado correctamente con vista personalizada'], 200);
+    }
+
 
     /**
      * Display the specified resource.
