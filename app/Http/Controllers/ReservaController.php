@@ -190,6 +190,7 @@ class ReservaController extends Controller
         return response()->json([
             'id' => $reserva->id,
             'usuario_id' => $reserva->usuario->id ?? null,
+            'publicacion_id' => $reserva->publicacion->id ?? null,
             'nombre_usuario' => $nombreCompleto,
             'titulo_publicacion' => $reserva->publicacion->titulo ?? 'Sin título',
             'fecha_reserva' => $reserva->fecha_reserva,
@@ -203,9 +204,43 @@ class ReservaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        // Validar los datos, incluyendo el ID de la reserva
+        $validated = $request->validate([
+            'id' => 'required|exists:reservas,id',
+            'usuario_id' => 'required|exists:usuarios,id',
+            'publicacion_id' => 'required|exists:publicaciones,id',
+            'fecha_reserva' => 'required|date_format:Y-m-d H:i:s',
+            'total_pagar' => 'nullable|numeric',
+            'personas' => 'nullable|integer|min:1|max:4',
+        ]);
+
+        // Buscar la reserva
+        $reserva = Reserva::find($validated['id']);
+
+        if (!$reserva) {
+            return response()->json(['error' => 'Reserva no encontrada'], 404);
+        }
+
+        // (Opcional) Validar que el usuario autenticado sea el propietario
+        if ($reserva->usuario_id !== auth()->id()) {
+            return response()->json(['error' => 'No autorizado para modificar esta reserva'], 403);
+        }
+
+        // Actualizar campos
+        $reserva->usuario_id = $validated['usuario_id'];
+        $reserva->publicacion_id = $validated['publicacion_id'];
+        $reserva->fecha_reserva = $validated['fecha_reserva'];
+        $reserva->total_pagar = $validated['total_pagar'] ?? null;
+        $reserva->personas = $validated['personas'] ?? null;
+
+        $reserva->save();
+
+        return response()->json([
+            'message' => 'Reserva actualizada correctamente',
+            'reserva' => $reserva
+        ]);
     }
 
     public function obtenerReservasDetalladas()
