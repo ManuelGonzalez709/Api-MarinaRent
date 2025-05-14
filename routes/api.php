@@ -49,7 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('obtenerReservasUsuario/{id}', [ReservaController::class, 'getReservasPorIdUsuario']);
     Route::get('obtenerReservasDetalladas', [ReservaController::class, 'obtenerReservasDetalladas']);
     Route::post('actualizarReservas', [ReservaController::class, 'update']);
-
+    Route::post('intercambiarFechas', [ReservaController::class, 'intercambiarReserva']);
     
     //Subida de Imagenes (Imagenes singulares)
     Route::post('upload', [ImageController::class, 'upload']);
