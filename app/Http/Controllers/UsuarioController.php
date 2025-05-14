@@ -60,11 +60,39 @@ class UsuarioController extends Controller
 
         return response()->json(['usuario' => $usuario], 201);
     }
+
+    /**
+     * Obtener los datos del usuario autenticado.
+     */
+    public function obtenerDatosUsuarioAutenticado()
+    {
+        // Obtener el usuario autenticado
+        $usuario = auth()->user();
+
+        // Verificar si el usuario está autenticado
+        if (!$usuario) {
+            return response()->json(['error' => 'Usuario no autenticado'], 401);
+        }
+
+        // Devolver los datos del usuario
+        return response()->json([
+            'id' => $usuario->id,
+            'Nombre' => $usuario->Nombre,
+            'Apellidos' => $usuario->Apellidos,
+            'Email' => $usuario->Email,
+            'Fecha_nacimiento' => $usuario->Fecha_nacimiento,
+            'Tipo' => $usuario->Tipo,
+            "updated_at" => $usuario->updated_at
+        ]);
+    }
+
+
+
     /**
      * Envia un correo electrónico personalizado al usuario.
      * @param \Illuminate\Http\Request $request
      */
-    
+
 
     public function enviarCorreoPersonalizado(Request $request)
     {

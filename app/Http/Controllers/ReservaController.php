@@ -34,7 +34,7 @@ class ReservaController extends Controller
         }
 
         // Cargar reservas junto con el título de la publicación
-        $reservas = $usuario->reservas()->with(['publicacion:id,titulo'])->get();
+        $reservas = $usuario->reservas()->with(['publicacion:id,titulo,imagen'])->get();
 
 
         return response()->json($reservas);
@@ -246,63 +246,63 @@ class ReservaController extends Controller
     }
 
 
-public function intercambiarReserva(Request $request)
-{
-    // Validar los datos del request
-    $validated = $request->validate([
-        'id' => 'required|exists:reservas,id', // ID de la reserva que se quiere cambiar
-        'nueva_fecha_reserva' => 'required|date_format:Y-m-d H:i:s', // Nueva fecha de reserva
-        'correo' => 'nullable|boolean' // Si se debe enviar correo
-    ]);
+    public function intercambiarReserva(Request $request)
+    {
+        // Validar los datos del request
+        $validated = $request->validate([
+            'id' => 'required|exists:reservas,id', // ID de la reserva que se quiere cambiar
+            'nueva_fecha_reserva' => 'required|date_format:Y-m-d H:i:s', // Nueva fecha de reserva
+            'correo' => 'nullable|boolean' // Si se debe enviar correo
+        ]);
 
-    // Obtener la reserva original
-    $reservaOriginal = Reserva::with('usuario')->findOrFail($validated['id']);
+        // Obtener la reserva original
+        $reservaOriginal = Reserva::with('usuario')->findOrFail($validated['id']);
 
-    // Buscar una reserva para intercambiar (misma publicación y fecha nueva)
-    $reservaDestino = Reserva::with('usuario')
-        ->where('fecha_reserva', $validated['nueva_fecha_reserva'])
-        ->where('publicacion_id', $reservaOriginal->publicacion_id)
-        ->first();
+        // Buscar una reserva para intercambiar (misma publicación y fecha nueva)
+        $reservaDestino = Reserva::with('usuario')
+            ->where('fecha_reserva', $validated['nueva_fecha_reserva'])
+            ->where('publicacion_id', $reservaOriginal->publicacion_id)
+            ->first();
 
-    // Si no existe la reserva destino con la nueva fecha, devolver error
-    if (!$reservaDestino) {
-        return response()->json(['error' => 'No existe una reserva con esa fecha para intercambiar'], 404);
-    }
-
-    // Intercambiar las fechas de las reservas
-    $fechaTemp = $reservaOriginal->fecha_reserva;
-    $reservaOriginal->fecha_reserva = $reservaDestino->fecha_reserva;
-    $reservaDestino->fecha_reserva = $fechaTemp;
-
-    // Guardar las reservas con las nuevas fechas
-    $reservaOriginal->save();
-    $reservaDestino->save();
-
-    // Si el parámetro 'correo' es true, enviar correos a los usuarios
-    if ($request->has('correo') && $request->correo) {
-        $usuario1 = $reservaOriginal->usuario;
-        $usuario2 = $reservaDestino->usuario;
-
-        // Verificar si ambos usuarios tienen correo
-        if (!empty($usuario1->Email) && !empty($usuario2->Email)) {
-            $mensaje1 = "Hola {$usuario1->Nombre}, tu reserva ha sido cambiada al horario {$reservaOriginal->fecha_reserva}.";
-            $mensaje2 = "Hola {$usuario2->Nombre}, tu reserva ha sido cambiada al horario {$reservaDestino->fecha_reserva}.";
-
-            // Enviar los correos a ambos usuarios
-            Mail::to($usuario1->Email)->send(new CorreoPersonalizado($mensaje1));
-            Mail::to($usuario2->Email)->send(new CorreoPersonalizado($mensaje2));
-        } else {
-            return response()->json(['error' => 'Uno o ambos usuarios no tienen un Email asignado.'], 422);
+        // Si no existe la reserva destino con la nueva fecha, devolver error
+        if (!$reservaDestino) {
+            return response()->json(['error' => 'No existe una reserva con esa fecha para intercambiar'], 404);
         }
-    }
 
-    // Respuesta exitosa
-    return response()->json([
-        'message' => 'Reserva intercambiada correctamente',
-        'reserva_1' => $reservaOriginal,
-        'reserva_2' => $reservaDestino
-    ]);
-}
+        // Intercambiar las fechas de las reservas
+        $fechaTemp = $reservaOriginal->fecha_reserva;
+        $reservaOriginal->fecha_reserva = $reservaDestino->fecha_reserva;
+        $reservaDestino->fecha_reserva = $fechaTemp;
+
+        // Guardar las reservas con las nuevas fechas
+        $reservaOriginal->save();
+        $reservaDestino->save();
+
+        // Si el parámetro 'correo' es true, enviar correos a los usuarios
+        if ($request->has('correo') && $request->correo) {
+            $usuario1 = $reservaOriginal->usuario;
+            $usuario2 = $reservaDestino->usuario;
+
+            // Verificar si ambos usuarios tienen correo
+            if (!empty($usuario1->Email) && !empty($usuario2->Email)) {
+                $mensaje1 = "Hola {$usuario1->Nombre}, tu reserva ha sido cambiada al horario {$reservaOriginal->fecha_reserva}.";
+                $mensaje2 = "Hola {$usuario2->Nombre}, tu reserva ha sido cambiada al horario {$reservaDestino->fecha_reserva}.";
+
+                // Enviar los correos a ambos usuarios
+                Mail::to($usuario1->Email)->send(new CorreoPersonalizado($mensaje1));
+                Mail::to($usuario2->Email)->send(new CorreoPersonalizado($mensaje2));
+            } else {
+                return response()->json(['error' => 'Uno o ambos usuarios no tienen un Email asignado.'], 422);
+            }
+        }
+
+        // Respuesta exitosa
+        return response()->json([
+            'message' => 'Reserva intercambiada correctamente',
+            'reserva_1' => $reservaOriginal,
+            'reserva_2' => $reservaDestino
+        ]);
+    }
 
 
     public function obtenerReservasDetalladas()
