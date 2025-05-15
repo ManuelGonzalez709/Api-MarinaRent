@@ -40,6 +40,65 @@ class ReservaController extends Controller
         return response()->json($reservas);
     }
 
+    public function actualizarFechaPublicacionYReservas(Request $request)
+    {
+        $validated = $request->validate([
+            'publicacion_id' => 'required|exists:publicaciones,id',
+            'nueva_fecha_evento' => 'required|date_format:Y-m-d', // Solo la fecha, sin hora
+        ]);
+
+        $publicacion = Publicacion::findOrFail($validated['publicacion_id']);
+        $fechaAnterior = $publicacion->fecha_evento;
+        $nuevaFechaEvento = $validated['nueva_fecha_evento'];
+
+        // Actualizar la fecha del evento de la publicación
+        $publicacion->fecha_evento = $nuevaFechaEvento;
+        $publicacion->save();
+
+        // Obtener todas las reservas relacionadas con esta publicación
+        $reservas = Reserva::with('usuario')
+            ->where('publicacion_id', $publicacion->id)
+            ->get();
+
+        $reservasActualizadas = [];
+
+        foreach ($reservas as $reserva) {
+            // Extraer la hora original de la reserva
+            $horaOriginal = Carbon::parse($reserva->fecha_reserva)->format('H:i:s');
+
+            // Formar la nueva fecha completa
+            $nuevaFechaCompleta = $nuevaFechaEvento . ' ' . $horaOriginal;
+
+            // Actualizar la reserva
+            $reserva->fecha_reserva = $nuevaFechaCompleta;
+            $reserva->save();
+
+            // Guardar para notificación
+            $reservasActualizadas[] = [
+                'usuario' => $reserva->usuario,
+                'nueva_fecha' => $nuevaFechaCompleta
+            ];
+        }
+
+        // Enviar correos a los usuarios afectados
+        foreach ($reservasActualizadas as $item) {
+            $usuario = $item['usuario'];
+            $nuevaFecha = $item['nueva_fecha'];
+
+            if (!empty($usuario->Email)) {
+                $mensaje = "Hola {$usuario->Nombre}, la fecha de tu reserva ha cambiado a {$nuevaFecha}. Gracias por tu comprensión.";
+                Mail::to($usuario->Email)->send(new CorreoPersonalizado($mensaje));
+            }
+        }
+
+        return response()->json([
+            'message' => 'Fecha del evento y reservas actualizadas correctamente',
+            'nueva_fecha_evento' => $nuevaFechaEvento,
+            'total_reservas_afectadas' => count($reservasActualizadas)
+        ]);
+    }
+
+
     public function getReservasPorIdUsuario($id)
     {
         $usuario = \App\Models\Usuario::find($id);
