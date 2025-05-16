@@ -19,6 +19,36 @@ class PublicacionController extends Controller
         return response()->json(data: $publicaciones);
     }
 
+    public function obtenerPaginadas(Request $request)
+    {
+        // Constante de elementos por página
+        $ELEMENTOS_POR_PAGINA = 8;
+
+        // Obtener número de página desde la query (por defecto 1)
+        $pagina = (int) $request->input('pagina', 1);
+
+        try {
+            // Obtener publicaciones con paginación
+            $publicaciones = Publicacion::paginate($ELEMENTOS_POR_PAGINA, ['*'], 'page', $pagina);
+
+            // Preparar respuesta con metadatos personalizados
+            return response()->json([
+                'success' => true,
+                'data' => $publicaciones->items(),
+                'page' => $publicaciones->currentPage(),
+                'totalPages' => $publicaciones->lastPage()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener publicaciones paginadas.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
     public function obtenerInformativos()
     {
         $publicaciones = Publicacion::where('tipo', 'informativo')->get();
@@ -248,7 +278,7 @@ class PublicacionController extends Controller
     {
         $publicacion = Publicacion::find($id);
 
-        if (!$publicacion) 
+        if (!$publicacion)
             return response()->json(['message' => 'Publicación no encontrada.'], 404);
 
         try {

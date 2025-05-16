@@ -57,6 +57,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('upload', [ImageController::class, 'upload']);
 
 
+    //Obtener Datos Paginados
+    Route::post('publicacionesPaginadas', [PublicacionController::class, 'obtenerPaginadas']);
+    Route::post('reservasPaginadas', [ReservaController::class, 'paginarReservas']);
+    Route::post('usuariosPaginados', [UsuarioController::class, 'paginarUsuarios']);
+
+
 });
 
 //Funcion para obtener la fecha y la hora del Server

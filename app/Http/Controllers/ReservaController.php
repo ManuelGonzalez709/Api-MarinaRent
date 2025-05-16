@@ -21,6 +21,47 @@ class ReservaController extends Controller
         return response()->json($reservas);
     }
 
+
+    public function paginarReservas(Request $request)
+    {
+        // Definir el número de elementos por página
+        $perPage = 10;
+
+        // Obtener la página desde el cuerpo de la solicitud, por defecto 1
+        $page = (int) $request->input('pagina', 1);
+        $page = max($page, 1); // Evitar páginas menores a 1
+
+        // Obtener el total de reservas
+        $total = Reserva::count();
+
+        // Calcular total de páginas
+        $totalPages = (int) ceil($total / $perPage);
+
+        // Obtener las reservas de la página solicitada
+        $reservas = Reserva::with(['usuario:id,Nombre,Apellidos', 'publicacion:id,titulo'])
+            ->skip(($page - 1) * $perPage)
+            ->take($perPage)
+            ->get()
+            ->map(function ($reserva) {
+                return [
+                    'id' => $reserva->id,
+                    'nombre_usuario' => $reserva->usuario ? $reserva->usuario->Nombre . ' ' . $reserva->usuario->Apellidos : 'Desconocido',
+                    'titulo_publicacion' => $reserva->publicacion->titulo ?? 'Sin título',
+                    'fecha_reserva' => $reserva->fecha_reserva,
+                    'total_pagar' => $reserva->total_pagar ?? 0,
+                    'personas' => $reserva->personas,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $reservas,
+            'page' => $page,
+            'totalPages' => $totalPages
+        ]);
+    }
+
+
     public function cancelarReservaUsuario($idReserva)
     {
 

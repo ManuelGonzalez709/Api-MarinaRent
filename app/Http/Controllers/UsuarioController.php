@@ -15,6 +15,48 @@ class UsuarioController extends Controller
         return response()->json(data: $usuarios);
     }
 
+    public function paginarUsuarios(Request $request)
+{
+    // Definir el número de elementos por página
+    $perPage = 10;
+
+    // Obtener la página desde el cuerpo de la solicitud, por defecto 1
+    $page = (int) $request->input('pagina', 1);
+    $page = max($page, 1); // Asegurar que sea al menos 1
+
+    // Obtener el total de usuarios
+    $total = Usuario::count();
+
+    // Calcular total de páginas
+    $totalPages = (int) ceil($total / $perPage);
+
+    // Obtener los usuarios de la página solicitada
+    $usuarios = Usuario::skip(($page - 1) * $perPage)
+        ->take($perPage)
+        ->get()
+        ->map(function ($usuario) {
+            return [
+                'id' => $usuario->id,
+                'Nombre' => $usuario->Nombre,
+                'Apellidos' => $usuario->Apellidos,
+                'Email' => $usuario->Email,
+                'Fecha_nacimiento' => $usuario->Fecha_nacimiento,
+                'Tipo' => $usuario->Tipo,
+                'updated_at' => $usuario->updated_at,
+            ];
+        });
+
+    return response()->json([
+        'success' => true,
+        'data' => $usuarios,
+        'page' => $page,
+        'totalPages' => $totalPages
+    ]);
+}
+
+
+
+
     public function obtenerAdmin()
     {
         $usuario = auth()->user();
