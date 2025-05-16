@@ -52,16 +52,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('actualizarReservas', [ReservaController::class, 'update']);
     Route::post('intercambiarFechas', [ReservaController::class, 'intercambiarReserva']);
     
-
     //Subida de Imagenes (Imagenes singulares)
     Route::post('upload', [ImageController::class, 'upload']);
-
 
     //Obtener Datos Paginados
     Route::post('publicacionesPaginadas', [PublicacionController::class, 'obtenerPaginadas']);
     Route::post('reservasPaginadas', [ReservaController::class, 'paginarReservas']);
     Route::post('usuariosPaginados', [UsuarioController::class, 'paginarUsuarios']);
-
+    Route::post('informativosPaginados', [PublicacionController::class, 'obtenerInformativosPaginados']);
+    Route::post('alquilablesPaginados', [PublicacionController::class, 'obtenerAlquilablesPaginados']);
 
 });
 

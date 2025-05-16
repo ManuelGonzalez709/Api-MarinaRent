@@ -46,6 +46,56 @@ class PublicacionController extends Controller
             ], 500);
         }
     }
+    ////Paginacion de publicaciones por tipo 
+    public function obtenerAlquilablesPaginados(Request $request)
+    {
+        $ELEMENTOS_POR_PAGINA = 8;
+        $pagina = (int) $request->input('pagina', 1);
+
+        try {
+            $publicaciones = Publicacion::where('tipo', 'alquilable')
+                ->whereDate('fecha_evento', '>=', Carbon::today())
+                ->paginate($ELEMENTOS_POR_PAGINA, ['*'], 'page', $pagina);
+
+            return response()->json([
+                'success' => true,
+                'data' => $publicaciones->items(),
+                'page' => $publicaciones->currentPage(),
+                'totalPages' => $publicaciones->lastPage()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener publicaciones alquilables paginadas.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function obtenerInformativosPaginados(Request $request)
+    {
+        $ELEMENTOS_POR_PAGINA = 8;
+        $pagina = (int) $request->input('pagina', 1);
+
+        try {
+            $publicaciones = Publicacion::where('tipo', 'informativo')
+                ->whereDate('fecha_evento', '>=', Carbon::today())
+                ->paginate($ELEMENTOS_POR_PAGINA, ['*'], 'page', $pagina);
+
+            return response()->json([
+                'success' => true,
+                'data' => $publicaciones->items(),
+                'page' => $publicaciones->currentPage(),
+                'totalPages' => $publicaciones->lastPage()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener publicaciones informativas paginadas.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 
 
