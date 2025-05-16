@@ -101,6 +101,7 @@ Route::post('register', function (Request $request) {
         'Fecha_nacimiento' => $validated['Fecha_nacimiento'],
         'Email' => $validated['Email'],
         'Password' => Hash::make($validated['Password']),
+        'Tipo' => 'usuario'
     ]);
 
     // Crear un token para el nuevo usuario
