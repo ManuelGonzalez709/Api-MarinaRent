@@ -39,3 +39,13 @@ php artisan migrate:fresh --seed
 ### Headers for protected routes
 ```http
 Authorization: Bearer {YOUR_TOKEN}
+````
+
+---
+
+#### Instal composer to run
+```bash
+php install composer
+php artisan serve
+````
+
