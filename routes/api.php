@@ -15,54 +15,56 @@ use App\Models\Reserva;
 use Illuminate\Support\Carbon;
 
 Route::middleware('auth:sanctum')->group(function () {
-    /*
-    if (auth()->user()->Tipo == 'admin') {
-        Route::post('generarDatos', function () {
-            Publicacion::factory(10)->create();
-            Usuario::factory(10)->create();
-            Reserva::factory(10)->create();
-            return response()->json(['message' => '10 publicaciones creadas correctamente.']);
-        });
-    }*/
 
-    // CRUD para usuarios, publicaciones y reservas
-    Route::apiResource('usuarios', UsuarioController::class);
-    Route::apiResource('publicaciones', PublicacionController::class);
-    Route::apiResource('reservas', ReservaController::class);
+    // Rutas solo para admin
+    Route::middleware('isAdmin')->group(function () {
 
-    // Publicaciones Ruta para obtener publicaciones Informativas y Alquilables
+        // Rutas completas (CRUD) para usuarios, publicaciones y reservas (solo para admin)
+        Route::apiResource('usuarios', UsuarioController::class)->only(['destroy','show']);
+        Route::apiResource('publicaciones', PublicacionController::class)->only(['update', 'store', 'destroy']);
+        Route::apiResource('reservas', ReservaController::class)->only(['update','destroy']);
+
+        // Rutas específicas de actualización que solo puede usar admin
+        Route::post('actualizar', [PublicacionController::class, 'update']);
+        Route::post('actualizarReservas', [ReservaController::class, 'update']);
+        Route::post('actualizarFechaPublicacion', [ReservaController::class, 'actualizarFechaPublicacionYReservas']);
+        Route::post('intercambiarFechas', [ReservaController::class, 'intercambiarReserva']);
+
+        // Subida de imagenes
+        Route::post('upload', [ImageController::class, 'upload']);
+        
+    });
+
+    Route::apiResource('usuarios', UsuarioController::class)->only(['index', 'store', 'update']);
+    Route::apiResource('publicaciones', PublicacionController::class)->only(['index', 'show']);
+    Route::apiResource('reservas', ReservaController::class)->except(['update']);
+
+    // Publicaciones informativas y alquilables
     Route::get('informativos', [PublicacionController::class, 'obtenerInformativos']);
     Route::get('alquilables', [PublicacionController::class, 'obtenerAlquilables']);
-    Route::post('actualizar', [PublicacionController::class, 'update']);
-    Route::post('actualizarFechaPublicacion', [ReservaController::class, 'actualizarFechaPublicacionYReservas']);
 
-    //Usuario
+    // Usuario autenticado
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
+    Route::get('getData', [UsuarioController::class, 'obtenerDatosUsuarioAutenticado']);
+    Route::post('mailTo', [UsuarioController::class, 'enviarCorreoPersonalizado']);
     Route::get('isAdmin', [UsuarioController::class, 'obtenerAdmin']);
     Route::post('usuarios/actualizar', [UsuarioController::class, 'actualizar']);
-    Route::post('mailTo', [UsuarioController::class, 'enviarCorreoPersonalizado']);
-    Route::get('getData', [UsuarioController::class, 'obtenerDatosUsuarioAutenticado']);
 
-    //Reservas
+    // Reservas extras
     Route::post('disponibilidadReserva', [ReservaController::class, 'getDisponibilidad']);
     Route::post('capacidadDisponible', [ReservaController::class, 'getCapacidadDisponible']);
     Route::get('obtenerReservasUsuario', [ReservaController::class, 'getReservasPorUsuario']);
     Route::get('obtenerReservasUsuario/{id}', [ReservaController::class, 'getReservasPorIdUsuario']);
     Route::get('obtenerReservasDetalladas', [ReservaController::class, 'obtenerReservasDetalladas']);
-    Route::post('actualizarReservas', [ReservaController::class, 'update']);
-    Route::post('intercambiarFechas', [ReservaController::class, 'intercambiarReserva']);
-    
-    //Subida de Imagenes (Imagenes singulares)
-    Route::post('upload', [ImageController::class, 'upload']);
 
-    //Obtener Datos Paginados
+    // Paginación
     Route::post('publicacionesPaginadas', [PublicacionController::class, 'obtenerPaginadas']);
     Route::post('reservasPaginadas', [ReservaController::class, 'paginarReservas']);
     Route::post('usuariosPaginados', [UsuarioController::class, 'paginarUsuarios']);
     Route::post('informativosPaginados', [PublicacionController::class, 'obtenerInformativosPaginados']);
     Route::post('alquilablesPaginados', [PublicacionController::class, 'obtenerAlquilablesPaginados']);
-
 });
+
 
 //Funcion para obtener la fecha y la hora del Server
 Route::get('horaFecha', function () {
@@ -82,7 +84,9 @@ Route::get('restablecer-password/{email}', [RestablecerPasswordEmailController::
 // Restablece la contraseña al dar click en restablecer contraseña en la pagina de restablecimiento de contraseña
 Route::post('restablecer-password', [RestablecerPasswordEmailController::class, 'restablecer'])->name('restablecer.password');
 //Retorna la vista de Success
-Route::get('password-reset-success', function () {return view('password-reset-success');})->name('password.reset.success');
+Route::get('password-reset-success', function () {
+    return view('password-reset-success');
+})->name('password.reset.success');
 
 ////Register
 Route::post('register', function (Request $request) {
@@ -123,4 +127,3 @@ Route::post('login', function (Request $request) {
 
     return response()->json(['token' => $token], 200);
 });
-

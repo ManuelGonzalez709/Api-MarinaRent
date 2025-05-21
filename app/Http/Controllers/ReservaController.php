@@ -325,11 +325,6 @@ class ReservaController extends Controller
             return response()->json(['error' => 'Reserva no encontrada'], 404);
         }
 
-        // (Opcional) Validar que el usuario autenticado sea el propietario
-        if ($reserva->usuario_id !== auth()->id()) {
-            return response()->json(['error' => 'No autorizado para modificar esta reserva'], 403);
-        }
-
         // Actualizar campos
         $reserva->usuario_id = $validated['usuario_id'];
         $reserva->publicacion_id = $validated['publicacion_id'];
@@ -436,10 +431,6 @@ class ReservaController extends Controller
 
         if (!$reserva) {
             return response()->json(['error' => 'Reserva no encontrada'], 404);
-        }
-
-        if ($reserva->usuario_id !== auth()->id()) {
-            return response()->json(['error' => 'No autorizado'], 403);
         }
 
         $reserva->delete();
