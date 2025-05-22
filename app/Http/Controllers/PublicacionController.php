@@ -207,6 +207,14 @@ class PublicacionController extends Controller
         }
     }
 
+    public function obtenerPublicacionesAleatorias()
+    {
+        // Retorna 6 publicaciones aleatorias
+        $publicaciones = Publicacion::inRandomOrder()->limit(6)->get();
+
+        return response()->json($publicaciones);
+    }
+
     public function update(Request $request)
     {
         Log::info('Iniciando método update para actualizar publicación', ['request' => $request->all()]);

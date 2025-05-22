@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Publicaciones informativas y alquilables
     Route::get('informativos', [PublicacionController::class, 'obtenerInformativos']);
     Route::get('alquilables', [PublicacionController::class, 'obtenerAlquilables']);
+    Route::get('publicacionesAleatorias', [PublicacionController::class, 'obtenerPublicacionesAleatorias']);
 
     // Usuario autenticado
     Route::get('usuario/getId', [UsuarioController::class, 'obtenerUsuarioAutenticado']);
