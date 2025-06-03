@@ -11,7 +11,8 @@ use App\Http\Controllers\ImageController;
 class PublicacionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /publicaciones
+     * Devuelve todas las publicaciones.
      */
     public function index()
     {
@@ -19,6 +20,10 @@ class PublicacionController extends Controller
         return response()->json(data: $publicaciones);
     }
 
+    /**
+     * POST /publicacionesPaginadas
+     * Devuelve publicaciones paginadas. Recibe 'pagina' en el body.
+     */
     public function obtenerPaginadas(Request $request)
     {
         // Constante de elementos por página
@@ -46,7 +51,11 @@ class PublicacionController extends Controller
             ], 500);
         }
     }
-    ////Paginacion de publicaciones por tipo 
+
+    /**
+     * POST /alquilablesPaginados
+     * Devuelve publicaciones de tipo 'alquilable' paginadas y con fecha futura.
+     */
     public function obtenerAlquilablesPaginados(Request $request)
     {
         $ELEMENTOS_POR_PAGINA = 8;
@@ -72,6 +81,10 @@ class PublicacionController extends Controller
         }
     }
 
+    /**
+     * POST /informativosPaginados
+     * Devuelve publicaciones de tipo 'informativo' paginadas y con fecha futura.
+     */
     public function obtenerInformativosPaginados(Request $request)
     {
         $ELEMENTOS_POR_PAGINA = 8;
@@ -97,8 +110,10 @@ class PublicacionController extends Controller
         }
     }
 
-
-
+    /**
+     * GET /informativos
+     * Devuelve todas las publicaciones de tipo 'informativo'.
+     */
     public function obtenerInformativos()
     {
         $publicaciones = Publicacion::where('tipo', 'informativo')->get();
@@ -109,6 +124,11 @@ class PublicacionController extends Controller
 
         return response()->json($publicaciones);
     }
+
+    /**
+     * GET /alquilables
+     * Devuelve todas las publicaciones de tipo 'alquilable'.
+     */
     public function obtenerAlquilables()
     {
         $publicaciones = Publicacion::where('tipo', 'alquilable')->get();
@@ -121,7 +141,8 @@ class PublicacionController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /publicaciones
+     * Crea una nueva publicación con imágenes.
      */
     public function store(Request $request)
     {
@@ -207,6 +228,10 @@ class PublicacionController extends Controller
         }
     }
 
+    /**
+     * GET /publicacionesAleatorias
+     * Devuelve 6 publicaciones aleatorias.
+     */
     public function obtenerPublicacionesAleatorias()
     {
         // Retorna 6 publicaciones aleatorias
@@ -215,6 +240,10 @@ class PublicacionController extends Controller
         return response()->json($publicaciones);
     }
 
+    /**
+     * PUT /publicaciones
+     * Actualiza una publicación existente y sus imágenes.
+     */
     public function update(Request $request)
     {
         Log::info('Iniciando método update para actualizar publicación', ['request' => $request->all()]);
@@ -316,7 +345,8 @@ class PublicacionController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * GET /publicaciones/{id}
+     * Devuelve los datos de una publicación por su id.
      */
     public function show(string $id)
     {
@@ -330,7 +360,8 @@ class PublicacionController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /publicaciones/{id}
+     * Elimina una publicación y sus imágenes asociadas.
      */
     public function destroy(string $id)
     {

@@ -7,30 +7,45 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CorreoPersonalizado;
+
+/*
+|--------------------------------------------------------------------------
+| UsuarioController
+|--------------------------------------------------------------------------
+| Controlador para la gestión de usuarios.
+| Cada método indica su endpoint correspondiente.
+*/
+
 class UsuarioController extends Controller
 {
+    /**
+     * GET /usuarios
+     * Devuelve todos los usuarios.
+     */
     public function index()
     {
         $usuarios = Usuario::all();
         return response()->json(data: $usuarios);
     }
 
+    /**
+     * POST /paginarUsuarios
+     * Devuelve usuarios paginados. Recibe 'pagina' en el body.
+     */
     public function paginarUsuarios(Request $request)
     {
-        // Definir el número de elementos por página
+        // Número de elementos por página
         $perPage = 10;
 
-        // Obtener la página desde el cuerpo de la solicitud, por defecto 1
+        // Página solicitada (por defecto 1)
         $page = (int) $request->input('pagina', 1);
-        $page = max($page, 1); // Asegurar que sea al menos 1
+        $page = max($page, 1);
 
-        // Obtener el total de usuarios
+        // Total de usuarios y páginas
         $total = Usuario::count();
-
-        // Calcular total de páginas
         $totalPages = (int) ceil($total / $perPage);
 
-        // Obtener los usuarios de la página solicitada
+        // Usuarios de la página solicitada
         $usuarios = Usuario::skip(($page - 1) * $perPage)
             ->take($perPage)
             ->get()
@@ -54,9 +69,10 @@ class UsuarioController extends Controller
         ]);
     }
 
-
-
-
+    /**
+     * GET /isAdmin
+     * Devuelve si el usuario autenticado es admin.
+     */
     public function obtenerAdmin()
     {
         $usuario = auth()->user();
@@ -66,17 +82,23 @@ class UsuarioController extends Controller
         ]);
     }
 
+    /**
+     * GET /usuario/getId
+     * Devuelve solo el id del usuario autenticado.
+     */
     public function obtenerUsuarioAutenticado()
     {
         $usuario = auth()->user();
         return response()->json($usuario->only(['id']));
     }
+
     /**
-     * Store a newly created resource in storage.
+     * POST /usuarios
+     * Crea un nuevo usuario.
      */
     public function store(Request $request)
     {
-        // Validar los datos
+        // Validar los datos recibidos
         $validator = Validator::make($request->all(), [
             'Nombre' => 'required|string|max:255',
             'Apellidos' => 'required|string|max:255',
@@ -90,7 +112,7 @@ class UsuarioController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Crear el nuevo usuario
+        // Crear el usuario
         $usuario = Usuario::create([
             'Nombre' => $request->input('Nombre'),
             'Apellidos' => $request->input('Apellidos'),
@@ -104,19 +126,17 @@ class UsuarioController extends Controller
     }
 
     /**
-     * Obtener los datos del usuario autenticado.
+     * GET /getData
+     * Devuelve los datos del usuario autenticado.
      */
     public function obtenerDatosUsuarioAutenticado()
     {
-        // Obtener el usuario autenticado
         $usuario = auth()->user();
 
-        // Verificar si el usuario está autenticado
         if (!$usuario) {
             return response()->json(['error' => 'Usuario no autenticado'], 401);
         }
 
-        // Devolver los datos del usuario
         return response()->json([
             'id' => $usuario->id,
             'Nombre' => $usuario->Nombre,
@@ -129,14 +149,10 @@ class UsuarioController extends Controller
         ]);
     }
 
-
-
     /**
-     * Envia un correo electrónico personalizado al usuario.
-     * @param \Illuminate\Http\Request $request
+     * POST /mailTo
+     * Envía un correo personalizado al usuario.
      */
-
-
     public function enviarCorreoPersonalizado(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -156,9 +172,9 @@ class UsuarioController extends Controller
         return response()->json(['success' => 'Correo enviado correctamente con vista personalizada'], 200);
     }
 
-
     /**
-     * Display the specified resource.
+     * GET /usuarios/{id}
+     * Devuelve los datos de un usuario por su id.
      */
     public function show(int $id)
     {
@@ -178,60 +194,53 @@ class UsuarioController extends Controller
         ]);
     }
 
-
     /**
-     * Update the specified resource in storage.
+     * PUT /usuarios/actualizar
+     * Actualiza los datos de un usuario.
      */
     public function actualizar(Request $request)
     {
-        // Validar los datos que vienen en la solicitud
+        // Validar los datos recibidos
         $validator = Validator::make($request->all(), [
-            'id_usuario' => 'required|exists:usuarios,id', // Validamos que el ID exista en la base de datos
+            'id_usuario' => 'required|exists:usuarios,id',
             'Nombre' => 'required|string|max:255',
             'Apellidos' => 'required|string|max:255',
             'Email' => 'required|email|max:255|unique:usuarios,Email,' . $request->input('id_usuario'),
             'Fecha_nacimiento' => 'required|date',
             'Tipo' => 'required|string|in:admin,usuario',
-            'Password' => 'nullable|string|min:8', // Si no se proporciona una nueva contraseña, no se actualizará
+            'Password' => 'nullable|string|min:8',
         ]);
 
-        // Si hay errores en la validación, devolver una respuesta con los errores
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Buscar al usuario por su ID recibido en el cuerpo de la solicitud
+        // Buscar usuario y actualizar campos
         $usuario = Usuario::find($request->input('id_usuario'));
 
-        // Si el usuario no existe, devolver un error
         if (!$usuario) {
             return response()->json(['error' => 'Usuario no encontrado'], 404);
         }
 
-        // Actualizar los campos del usuario
         $usuario->Nombre = $request->input('Nombre');
         $usuario->Apellidos = $request->input('Apellidos');
         $usuario->Email = $request->input('Email');
         $usuario->Fecha_nacimiento = $request->input('Fecha_nacimiento');
         $usuario->Tipo = $request->input('Tipo');
 
-        // Si se proporciona una nueva contraseña, actualizarla
+        // Actualizar contraseña si se proporciona
         if ($request->has('Password') && $request->input('Password') !== null) {
-            $usuario->Password = bcrypt($request->input('Password')); // Encriptar la nueva contraseña
+            $usuario->Password = bcrypt($request->input('Password'));
         }
 
-        // Guardar los cambios en la base de datos
         $usuario->save();
 
-        // Devolver una respuesta con el usuario actualizado
         return response()->json(['usuario' => $usuario], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
-     */
-    /**
-     * Remove the specified resource from storage.
+     * DELETE /usuarios/{id}
+     * Elimina un usuario por su id.
      */
     public function destroy(string $id)
     {

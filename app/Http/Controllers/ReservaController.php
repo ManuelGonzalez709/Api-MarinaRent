@@ -13,7 +13,8 @@ use App\Mail\CorreoPersonalizado;
 class ReservaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /reservas
+     * Devuelve todas las reservas.
      */
     public function index()
     {
@@ -21,7 +22,10 @@ class ReservaController extends Controller
         return response()->json($reservas);
     }
 
-
+    /**
+     * POST /reservasPaginadas
+     * Devuelve reservas paginadas. Recibe 'pagina' en el body.
+     */
     public function paginarReservas(Request $request)
     {
         // Definir el número de elementos por página
@@ -61,12 +65,19 @@ class ReservaController extends Controller
         ]);
     }
 
-
+    /**
+     * POST /reservas/cancelar/{idReserva}
+     * Cancela una reserva por su ID (implementación pendiente).
+     */
     public function cancelarReservaUsuario($idReserva)
     {
 
     }
 
+    /**
+     * GET /obtenerReservasUsuario
+     * Devuelve todas las reservas del usuario autenticado.
+     */
     public function getReservasPorUsuario(Request $request)
     {
         $usuario = Auth::guard('sanctum')->user();
@@ -77,10 +88,13 @@ class ReservaController extends Controller
         // Cargar reservas junto con el título de la publicación
         $reservas = $usuario->reservas()->with(['publicacion:id,titulo,imagen'])->get();
 
-
         return response()->json($reservas);
     }
 
+    /**
+     * POST /actualizarFechaPublicacion
+     * Actualiza la fecha de una publicación y de todas sus reservas asociadas, notificando a los usuarios.
+     */
     public function actualizarFechaPublicacionYReservas(Request $request)
     {
         $validated = $request->validate([
@@ -139,7 +153,10 @@ class ReservaController extends Controller
         ]);
     }
 
-
+    /**
+     * GET /obtenerReservasUsuario/{id}
+     * Devuelve todas las reservas de un usuario por su ID.
+     */
     public function getReservasPorIdUsuario($id)
     {
         $usuario = \App\Models\Usuario::find($id);
@@ -154,10 +171,9 @@ class ReservaController extends Controller
         return response()->json($reservas);
     }
 
-
-
     /**
-     * Store a newly created resource in storage.
+     * POST /reservas
+     * Crea una nueva reserva para el usuario autenticado.
      */
     public function store(Request $request)
     {
@@ -199,7 +215,10 @@ class ReservaController extends Controller
         ], 201);
     }
 
-
+    /**
+     * POST /capacidadDisponible
+     * Devuelve la capacidad disponible para una publicación.
+     */
     public function getCapacidadDisponible(Request $request)
     {
         $idPublicacion = $request->input('idPublicacion');
@@ -236,7 +255,10 @@ class ReservaController extends Controller
         ]);
     }
 
-
+    /**
+     * POST /disponibilidadReserva
+     * Comprueba si una hora está disponible para reservar en una publicación.
+     */
     public function getDisponibilidad(Request $request)
     {
         $idPublicacion = $request->input('idPublicacion');
@@ -273,8 +295,10 @@ class ReservaController extends Controller
             'disponible' => !$existeReserva,
         ]);
     }
+
     /**
-     * Display the specified resource.
+     * GET /reservas/{id}
+     * Devuelve los datos de una reserva por su ID.
      */
     public function show(string $id)
     {
@@ -301,10 +325,9 @@ class ReservaController extends Controller
         ]);
     }
 
-
-
     /**
-     * Update the specified resource in storage.
+     * PUT /reservas
+     * Actualiza los datos de una reserva.
      */
     public function update(Request $request)
     {
@@ -340,7 +363,10 @@ class ReservaController extends Controller
         ]);
     }
 
-
+    /**
+     * POST /intercambiarFechas
+     * Intercambia la fecha de dos reservas y notifica a los usuarios si se solicita.
+     */
     public function intercambiarReserva(Request $request)
     {
         // Validar los datos del request
@@ -399,7 +425,10 @@ class ReservaController extends Controller
         ]);
     }
 
-
+    /**
+     * GET /obtenerReservasDetalladas
+     * Devuelve todas las reservas con información detallada de usuario y publicación.
+     */
     public function obtenerReservasDetalladas()
     {
         $reservas = Reserva::with(['usuario:id,Nombre,Apellidos', 'publicacion:id,titulo'])
@@ -423,7 +452,8 @@ class ReservaController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /reservas/{id}
+     * Elimina (cancela) una reserva por su ID.
      */
     public function destroy(string $id)
     {
