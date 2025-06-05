@@ -1,51 +1,174 @@
-# 🚀 API Proyecto Final MarinaRent
+# 🚤 API MarinaRent - Proyecto Final DAW
 
-La API **MarinaRent** es un proyecto desarrollado en **Laravel** para gestionar el alquiler de amarres y servicios en un puerto deportivo. Está diseñada para manejar usuarios, reservas, servicios y más, todo ello con seguridad, autenticación por tokens y datos de prueba generados automáticamente.
+[![Laravel](https://img.shields.io/badge/Laravel-v8.x-brightgreen)](https://laravel.com/)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-![Laravel](https://img.shields.io/badge/Laravel-v8.x-brightgreen)
-
----
-
-## 🔐 Seguridad
-
-Esta API implementa autenticación mediante tokens gracias a SANCTUM, permitiendo que solo usuarios registrados o autenticados puedan acceder a la mayoría de endpoints.
-
-- Para obtener acceso, el usuario debe registrarse o iniciar sesión.
-- Se genera un **token de acceso** que debe ser enviado en cada petición protegida mediante el header
-- Permite el **Restablecimiento de Contraseñas** mediante un enlace enviado al correo
-
-## 🧪 Seeders
-El proyecto incluye seeders automáticos para generar datos falsos de prueba (usuarios, amarres, reservas, etc.). Esto facilita la prueba sin necesidad de introducir datos manualmente.
-
-php artisan migrate:fresh --seed
+Bienvenido a **MarinaRent**, la API definitiva para gestionar el alquiler de amarres y servicios en un puerto deportivo, desarrollada con **Laravel** como proyecto final de DAW. Este backend está pensado para ser robusto, seguro y fácil de probar, integrando autenticación, seeders automáticos y una arquitectura clara de endpoints para usuarios, reservas, publicaciones y administración.
 
 ---
 
-### CRUD Operations
-- `GET /api/users` → List users
-- `POST /api/users` → Create user
-- `PUT /api/users/{id}` → Update user
-- `DELETE /api/users/{id}` → Delete user
-- `GET /api/reservations` → List reservations
-- `POST /api/reservations` → Create reservation
-- `PUT /api/reservations/{id}` → Update reservation
-- `DELETE /api/reservations/{id}` → Delete reservation
-- `GET /api/publications` → List publications
-- `POST /api/publications` → Create publication
-- `PUT /api/publications/{id}` → Update publication
-- `DELETE /api/publications/{id}` → Delete publication
-- `POST /api/upload` → Upload an image (multipart/form-data). This route allows you to upload images related to publications or any other   entities that require images in your application.
+## 🛡️ Seguridad & Autenticación
 
-### Headers for protected routes
+La API protege todos los endpoints sensibles usando **Laravel Sanctum**:
+
+- Registro y login con generación de **token de acceso**.
+- El token debe enviarse en el header en cada petición protegida:
+  ```http
+  Authorization: Bearer TU_TOKEN
+  ```
+- Reestablecimiento de contraseña vía email.
+- Acceso restringido a usuarios autenticados y roles de administrador.
+
+### Ejemplo de autenticación
+
+**Registro:**
 ```http
-Authorization: Bearer {YOUR_TOKEN}
-````
+POST /api/register
+Content-Type: application/json
+
+{
+  "name": "Manuel",
+  "email": "manuel@example.com",
+  "password": "password",
+  "password_confirmation": "password"
+}
+```
+
+**Login:**
+```http
+POST /api/login
+Content-Type: application/json
+
+{
+  "email": "manuel@example.com",
+  "password": "password"
+}
+```
+
+**Respuesta:**
+```json
+{
+  "token": "TU_TOKEN_DE_ACCESO"
+}
+```
 
 ---
 
-#### Instal composer to run
-```bash
-php install composer
-php artisan serve
-````
+## ⚡ Endpoints principales
 
+### Usuarios
+- `GET    /api/usuarios`           → Lista usuarios
+- `POST   /api/usuarios`           → Crear usuario
+- `PUT    /api/usuarios/{id}`      → Actualizar usuario
+
+### Reservas
+- `GET    /api/reservas`           → Lista reservas
+- `POST   /api/reservas`           → Crear reserva
+- `DELETE /api/reservas/{id}`      → Eliminar reserva
+- `GET    /api/obtenerReservasUsuario` → Reservas del usuario autenticado
+- `GET    /api/obtenerReservasUsuario/{id}` → Reservas por ID de usuario
+- `POST   /api/disponibilidadReserva` → Comprobar disponibilidad de hora y fecha
+- `POST   /api/capacidadDisponible`   → Consultar aforo/capacidad de publicación
+
+### Publicaciones
+- `GET    /api/publicaciones`      → Lista de publicaciones
+- `GET    /api/informativos`       → Publicaciones informativas
+- `GET    /api/alquilables`        → Publicaciones disponibles para alquilar
+- `POST   /api/publicaciones`      → Crear publicación (admin)
+- `POST   /api/upload`             → Subir imagen (multipart/form-data)
+
+### Admin
+- `POST   /api/actualizar`                     → Actualizar publicación (admin)
+- `POST   /api/actualizarReservas`             → Actualizar reservas masivamente (admin)
+- `POST   /api/actualizarFechaPublicacion`     → Cambiar fecha de evento y reservas (admin)
+- `POST   /api/intercambiarFechas`             → Intercambiar reservas (admin)
+- `GET    /api/isAdmin`                        → Verifica si el usuario autenticado es admin
+
+### Ejemplo de subida de imágenes
+
+```http
+POST /api/upload
+Content-Type: multipart/form-data
+Authorization: Bearer TU_TOKEN
+
+Body:
+photo: archivo.jpg
+```
+**Respuesta:**
+```json
+{
+  "success": true,
+  "path": "http://localhost:8000/storage/photos/archivo.jpg"
+}
+```
+
+---
+
+## 🧪 Seeders y Pruebas de Datos
+
+¡Olvídate de meter datos a mano! El proyecto incluye seeders automáticos para crear usuarios, amarres, reservas y publicaciones de prueba:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+## ⚙️ Requisitos
+
+- **PHP 8.0+**
+- **Composer**
+- **Laravel 8.x o superior**
+- **Base de datos (MySQL, SQLite, etc.)**
+
+---
+
+## 🚀 Instalación y Puesta en marcha
+
+### 1. Clona el repositorio
+```bash
+git clone https://github.com/ManuelGonzalez709/Api-MarinaRent.git
+cd Api-MarinaRent
+```
+
+### 2. Instala dependencias
+```bash
+composer install
+```
+
+### 3. Configura el entorno
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+Edita `.env` y ajusta tu base de datos.
+
+### 4. Migra y pobla la base de datos
+```bash
+php artisan migrate --seed
+```
+
+### 5. Enlaza almacenamiento público
+```bash
+php artisan storage:link
+```
+
+### 6. Arranca el servidor
+```bash
+php artisan serve
+```
+
+---
+
+## 👨‍💻 Autor
+
+**Manuel González Pérez**  
+🎓 Técnico Superior en DAM y DAW  
+💻 Tecnologías: PHP, Laravel, Spring, React, JavaScript, .NET, Python, Java  
+🔗 [GitHub](https://github.com/ManuelGonzalez709)
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia MIT.
